@@ -8,18 +8,34 @@ I will also not provide any help with extracted version of this mod ( or any oth
 
 Please do not upload edited or not version of this mod anywhere. You should upload self contained addons that use the APIs below.
 
-## Tool Modding
+# Table of Contents
+- [Tool Modding](#tool-modding)
+	- Adding models for the tool
+    - Adding a set of ignition sounds for the tool
+    - Adding swing sounds
+    - Adding hum sounds
+- [Weapon & Entity Modding](#weapon--entity-modding)
+    - Custom damage for lightsaber
+    - Preventing force power usage
+    - Adding new force powers
+    - Adding custom HUD, hiding default HUD
+    - Preventing default Force Power selection functionality
+    - Spawning the weapon and giving it custom colors, etc
+- [Creating Lightsaber models](#creating-lightsaber-models)
+- [Console variables](#console-variables)
+
+# Tool Modding
 
 How to add new stuff to the Sandbox tool. All of the code in this section **must** be called shared - both on client and server.
 
-### Adding models for the tool
+#### Adding models for the tool
 ```
 list.Set( "LightsaberModels", "<pathToModel>", {} )
 ```
 ```<pathToModel>``` is your path to the model file.
 Must start with ```models/``` and end with ```.mdl```, for example ```models/weapons/stuff.mdl```.
 
-### Adding a set of ignition sounds for the tool
+#### Adding a set of ignition sounds for the tool
 ```
 list.Set( "rb655_LightsaberIgniteSounds", "#myCustomUniqueInternalName", {
 	rb655_lightsaber_onsound = "<pathToOnSound>",
@@ -35,7 +51,7 @@ Must **NOT** start with ```sound/```, for example ```lightsabers/myOnSound1.wav`
 
 File format **MUST** be compatible with Garry's Mod, so either ```.wav``` or ```.mp3``` will do. Recommended format is ```.wav```.
 
-### Adding swing sounds
+#### Adding swing sounds
 ```
 list.Set( "rb655_LightsaberSwingSounds", "#myCustomUniqueInternalName", {
 	rb655_lightsaber_swingsound = "<pathToSwingSound>"
@@ -46,7 +62,7 @@ list.Set( "rb655_LightsaberSwingSounds", "#myCustomUniqueInternalName", {
 
 Learn how to make looping ```.wav``` files **[here](http://wiki.garrysmod.com/page/Creating_Looping_Sounds)**.
 
-### Adding hum sounds
+#### Adding hum sounds
 ```
 list.Set( "rb655_LightsaberHumSounds", "#myCustomUniqueInternalName", {
 	rb655_lightsaber_humsound = "<pathToHumSound>"
@@ -55,11 +71,11 @@ list.Set( "rb655_LightsaberHumSounds", "#myCustomUniqueInternalName", {
 
 ```<pathToHumSound>``` is your path to the **looping** sound file for idle hum. Rules from above apply.
 
-## Weapon & Entity Modding
+# Weapon & Entity Modding
 
 This section describes ways you can affect the Weapon and Entity of the mod.
 
-### Custom damage for lightsaber ( Weapon and Entity, Serverside )
+#### Custom damage for lightsaber ( Weapon and Entity, Serverside )
 ```
 hook.Add( "CanLightsaberDamageEntity", "my_unqiue_hook_name_here", function( victim, lightsaber, trace )
 	return 50 -- Makes the damage twice as high for the weapon
@@ -73,7 +89,7 @@ hook.Add( "CanLightsaberDamageEntity", "my_unqiue_hook_name_here", function( vic
 end )
 ```
 
-### Preventing force power usage ( Weapon, Shared )
+#### Preventing force power usage ( Weapon, Shared )
 ```
 GM:CanUseLightsaberForcePower( Entity owner, string power ) - return false to disallow owner to use and hide given Force Power from UI
 ```
@@ -110,7 +126,7 @@ List of current Force Powers:
 "Force Lightning"
 ```
 
-### Adding new force powers
+#### Adding new force powers
 ```
 rb655_AddForcePower( {
 	name = "My Force Power", -- Name of the force power, used in hooks too
@@ -128,7 +144,7 @@ rb655_AddForcePower( {
 } )
 ```
 ( ply, bind, pressed ) - return anything to block default action
-### Adding custom HUD, hiding default HUD ( Weapon, Clientside )
+#### Adding custom HUD, hiding default HUD ( Weapon, Clientside )
 ```
 GM:LightsaberDrawHUD( bool SelectionEnabled, number Force, number MaxForce, number SelectedForceID, table forcePowersTable )
 
@@ -146,7 +162,7 @@ hook.Add( "LightsaberDrawHUD", "my_unqiue_hud_hook_name_here", function( ForceSe
 end )
 ```
 
-### Preventing default Force Power selection functionality ( Weapon, Clientside )
+#### Preventing default Force Power selection functionality ( Weapon, Clientside )
 ```
 GM:LightsaberPlayerBindPress( ply, bind, pressed )
 
@@ -164,7 +180,7 @@ Console Command | Info
 ```rb655_select_next -1```|Selects the Force Power at the previous slot
 
 
-### Spawning the weapon and giving it custom colors, etc ( Serverside )
+#### Spawning the weapon and giving it custom colors, etc ( Serverside )
 ```
 local ply = Entity( 1 ) -- This is your player object
 
@@ -193,7 +209,7 @@ wep:SetMaxForce( 100 ) -- Sets the maximum force amount. Default is 100.
 wep.HitSound = "lightsaber/saber_hit.wav" -- Overrides the looping wall hit sound
 ```
 
-## Creating Lightsaber models
+# Creating Lightsaber models
 
 * Your models MUST have a bone named ```ValveBiped.Bip01_R_Hand``` to act as a weapon model. ( So it attaches to your hand )
 * Your models MUST have attachments for each blade:
@@ -205,7 +221,7 @@ wep.HitSound = "lightsaber/saber_hit.wav" -- Overrides the looping wall hit soun
  * quillon2
  * quillon3 - etc, format for Kylo Ren-like crossguard blades.
 
-## Console variables
+# Console variables
 
 Console Variable | Default | Realm | Info
 ------------ | ------------- | ------------- | -------------
