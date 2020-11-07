@@ -1,0 +1,21 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/props_meow/krhilt_diffuse"
+	"$bumpmap" "models/props_meow/krhilt_normals"
+	"$envmap"	"env_cubemap"
+	"$envmaptint"	"[.1 .1 .1]"
+	"$normalmapalphaenvmapmask" 1
+	"$surfaceprop"            "metal"
+	
+	
+
+
+    "$phong" "1"
+    "$phongboost" "2"
+    "$phongfresnelranges" "[0.35 0.7 1.5]"
+    "$phongexponent" 35  
+
+	"$rimlight" "1"		
+	"$rimlightexponent" "50"    
+	"$rimlightboost" "1"
+}

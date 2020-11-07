@@ -1,0 +1,12 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models\sgg\starwars\weapons\vader_saber\saber2"
+	"$bumpmap" "models\sgg\starwars\weapons\vader_saber\saber2_normal"
+	"$halflambert" "1"
+
+	"$phong" "1"
+	"$phongexponenttexture" "models\sgg\starwars\weapons\vader_saber\saber2"
+	"$phongexponent" "10"
+	"$phongboost" ".3"
+	"$phongfresnelranges" "[0.25 0.5 1]"
+}
