@@ -1,0 +1,8 @@
+{
+	"title"		:	"Star Wars Lightsabers",
+	"type"		:	"weapon",
+	"tags"		:	[ "fun", "comic" ],
+	"ignore"	:
+	[
+	]
+}
