@@ -1,0 +1,10 @@
+"Sprite"
+{
+	"$basetexture" "lightsaber/hard_light_trail"
+	
+	"$spriteorientation" "vp_parallel"
+	"$spriteorigin" "[0.50 0.50]"
+	
+	"$vertexcolor" "1"
+	"$spriterendermode" "5"
+}

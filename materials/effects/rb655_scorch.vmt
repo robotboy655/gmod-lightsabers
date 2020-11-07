@@ -1,0 +1,6 @@
+"LightmappedGeneric" {
+	"$basetexture" "effects/rb655_scorch"
+	"$translucent" "1"
+	"$decal" "1"
+	"$decalscale" "0.20"
+}

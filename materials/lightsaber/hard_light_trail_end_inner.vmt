@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "lightsaber/hard_light_trail_end_inner"
+	"$vertexcolor" "1"
+	"$alphatest" "1"
+	"$nocull" "1"
+}

@@ -1,0 +1,15 @@
+"Refract"
+{
+ 	"$normalmap" "effects/rb655_conc_normal"
+ 	"$refractamount" "-.2"
+	"$vertexalpha" "1"
+	"$vertexcolor" "1"
+	"$translucent" "1"
+	"$forcerefract" 1
+//	"$ignorez" "1"
+ 	"$bluramount" "1"
+	"$nofog" "1"
+//	"$refracttinttexture" "effects/rb655_conc_tint"
+	"$vertexcolormodulate" "1"
+
+}
