@@ -90,6 +90,28 @@ rb655_AddForcePower( {
 	end
 } )
 
+hook.Add( "EntityTakeDamage", "rb655_sabers_armor", function( victim, dmg )
+
+	local ply = victim
+	if ( !ply.GetActiveWeapon or !ply:IsPlayer() or !ply:KeyDown( IN_ATTACK2 ) --[[or !ply:IsOnGround()]] ) then return end
+
+	local wep = ply:GetActiveWeapon()
+	if ( !IsValid( wep ) or !rb655_IsLightsaber( wep ) or wep:GetActiveForcePowerType( wep:GetForceType() ).name != "Force Absorb" ) then return end
+
+	local force = wep:GetForce()
+	if ( force < 1 ) then return end
+
+	local damage = dmg:GetDamage() / 5
+	if ( force < damage ) then
+		wep:SetForce( 0 )
+		dmg:SetDamage( ( damage - force ) * 5 )
+	else
+		wep:SetForce( force - damage )
+		dmg:SetDamage( 0 )
+	end
+
+end )
+
 rb655_AddForcePower( {
 	name = "Force Repulse",
 	material = Material( "lightsaber_icons/repulse.png" ),
