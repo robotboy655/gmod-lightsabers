@@ -373,13 +373,14 @@ local function DoSliceSound( victim, inflictor )
 	end
 end
 
-hook.Add( "EntityTakeDamage", "rb655_lightsaber_kill_snd", function( ent, dmg )
-	if ( !IsValid( ent ) or !dmg or ent:IsNPC() or ent:IsPlayer() ) then return end
+hook.Add( "PostEntityTakeDamage", "rb655_lightsaber_kill_snd", function( ent, dmg, took )
+	if ( !IsValid( ent ) or !dmg or ent:IsNPC() or ent:IsPlayer() or !took ) then return end
 	if ( ent:Health() > 0 && ent:Health() - dmg:GetDamage() <= 0 ) then
 		local infl = dmg:GetInflictor()
 		if ( !IsValid( infl ) && IsValid( dmg:GetAttacker() ) && dmg:GetAttacker().GetActiveWeapon ) then -- Ugly fucking haxing workaround, thanks VOLVO
 			infl = dmg:GetAttacker():GetActiveWeapon()
 		end
+
 		DoSliceSound( ent, infl )
 	end
 end )
@@ -425,6 +426,7 @@ function rb655_LS_DoDamage( tr, wep )
 
 	local dmginfo = DamageInfo()
 	dmginfo:SetDamageForce( tr.HitNormal * -13.37 )
+	dmginfo:SetDamageType( DMG_SLASH )
 
 	if ( dmg ) then
 		dmginfo:SetDamage( tonumber( dmg ) )
