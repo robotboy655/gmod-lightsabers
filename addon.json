@@ -4,5 +4,8 @@
 	"tags"		:	[ "fun", "comic" ],
 	"ignore"	:
 	[
+		".git*",
+		"*.bat",
+		"*.md"
 	]
 }
