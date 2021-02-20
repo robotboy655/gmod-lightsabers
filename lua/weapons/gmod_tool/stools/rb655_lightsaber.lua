@@ -246,10 +246,12 @@ list.Set( "rb655_LightsaberHumSounds", "#tool.rb655_lightsaber.hum.6", { rb655_l
 list.Set( "rb655_LightsaberHumSounds", "#tool.rb655_lightsaber.hum.7", { rb655_lightsaber_humsound = "lightsaber/saber_loop7.wav" } )
 list.Set( "rb655_LightsaberHumSounds", "#tool.rb655_lightsaber.hum.8", { rb655_lightsaber_humsound = "lightsaber/saber_loop8.wav" } )
 list.Set( "rb655_LightsaberHumSounds", "#tool.rb655_lightsaber.dark", { rb655_lightsaber_humsound = "lightsaber/darksaber_loop.wav" } )
+list.Set( "rb655_LightsaberHumSounds", "#tool.rb655_lightsaber.kylo", { rb655_lightsaber_humsound = "lightsaber/saber_loop_kylo.wav" } )
 
 list.Set( "rb655_LightsaberSwingSounds", "#tool.rb655_lightsaber.jedi", { rb655_lightsaber_swingsound = "lightsaber/saber_swing1.wav" } )
 list.Set( "rb655_LightsaberSwingSounds", "#tool.rb655_lightsaber.sith", { rb655_lightsaber_swingsound = "lightsaber/saber_swing2.wav" } )
 list.Set( "rb655_LightsaberSwingSounds", "#tool.rb655_lightsaber.dark", { rb655_lightsaber_swingsound = "lightsaber/darksaber_swing.wav" } )
+list.Set( "rb655_LightsaberSwingSounds", "#tool.rb655_lightsaber.kylo", { rb655_lightsaber_swingsound = "lightsaber/saber_swing_kylo.wav" } )
 
 list.Set( "rb655_LightsaberIgniteSounds", "#tool.rb655_lightsaber.jedi", { rb655_lightsaber_onsound = "lightsaber/saber_on1.wav", rb655_lightsaber_offsound = "lightsaber/saber_off1.wav" } )
 list.Set( "rb655_LightsaberIgniteSounds", "#tool.rb655_lightsaber.jedi_fast", { rb655_lightsaber_onsound = "lightsaber/saber_on1_fast.wav", rb655_lightsaber_offsound = "lightsaber/saber_off1_fast.wav" } )
@@ -552,8 +554,8 @@ local PresetPresets = {
 		rb655_lightsaber_dark = "0",
 		rb655_lightsaber_bladew = "2.1",
 		rb655_lightsaber_bladel = "40",
-		rb655_lightsaber_humsound = "lightsaber/saber_loop1.wav",
-		rb655_lightsaber_swingsound = "lightsaber/saber_swing1.wav",
+		rb655_lightsaber_humsound = "lightsaber/saber_loop_kylo.wav",
+		rb655_lightsaber_swingsound = "lightsaber/saber_swing_kylo.wav",
 		rb655_lightsaber_onsound = "lightsaber/saber_on_kylo.wav",
 		rb655_lightsaber_offsound = "lightsaber/saber_off_kylo.wav"
 	},
