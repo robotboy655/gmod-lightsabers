@@ -68,11 +68,14 @@ list.Add( "NPCUsableWeapons", { class = "weapon_lightsaber", title = SWEP.PrintN
 
 -- --------------------------------------------------------- Helper functions --------------------------------------------------------- --
 
-function SWEP:PlayWeaponSound( snd )
+function SWEP:PlayWeaponSound( snd, vol )
 	if ( CLIENT ) then return end
 	if ( IsValid( self:GetOwner() ) && IsValid( self:GetOwner():GetActiveWeapon() ) && self:GetOwner():GetActiveWeapon() != self ) then return end
-	if ( !IsValid( self.Owner ) ) then return self:EmitSound( snd ) end
-	self.Owner:EmitSound( snd )
+
+	if ( snd == self:GetOnSound() || snd == self:GetOffSound() ) then vol = 0.4 end
+
+	if ( !IsValid( self.Owner ) ) then return self:EmitSound( snd, nil, nil, vol ) end
+	self.Owner:EmitSound( snd, nil, nil, vol )
 end
 
 function SWEP:SelectTargets( num )
@@ -581,7 +584,7 @@ function SWEP:OnEnabled( bDeploy )
 	if ( !IsValid( self.Owner ) || self.SoundLoop ) then return end
 
 	self.SoundLoop = CreateSound( self.Owner, Sound( self.LoopSound ) )
-	if ( self.SoundLoop ) then self.SoundLoop:Play() end
+	if ( self.SoundLoop ) then self.SoundLoop:Play() self.SoundLoop:ChangeVolume( 0, 0 ) end
 
 	self.SoundSwing = CreateSound( self.Owner, Sound( self.SwingSound ) )
 	if ( self.SoundSwing ) then self.SoundSwing:Play() self.SoundSwing:ChangeVolume( 0, 0 ) end
@@ -831,18 +834,23 @@ function SWEP:Think()
 	end
 
 	if ( ( isTrace1Hit or isTrace2Hit ) && self.SoundHit ) then
-		self.SoundHit:ChangeVolume( math.Rand( 0.1, 0.5 ), 0 )
+		self.SoundHit:ChangeVolume( math.Rand( 0.1, 0.1 ), 0 )
 	elseif ( self.SoundHit ) then
 		self.SoundHit:ChangeVolume( 0, 0 )
 	end
 
 	-- ------------------------------------------------- SOUNDS ------------------------------------------------- --
 
+	-- Avoid these sounds when we first turn on the saber
+	local soundMask = 1
+	if ( self:GetBladeLength() < self:GetMaxLength() ) then soundMask = 0 end
+
 	if ( self.SoundSwing ) then
 
 		if ( self.LastAng != ang ) then
 			self.LastAng = self.LastAng or ang
-			self.SoundSwing:ChangeVolume( math.Clamp( ang:Distance( self.LastAng ) / 2, 0, 1 ), 0 )
+
+			self.SoundSwing:ChangeVolume( math.Clamp( ang:Distance( self.LastAng ) / 2, 0, soundMask ), 0 )
 		end
 
 		self.LastAng = ang
@@ -853,7 +861,8 @@ function SWEP:Think()
 
 		if ( self.LastPos != pos ) then
 			self.LastPos = self.LastPos or pos
-			self.SoundLoop:ChangeVolume( 0.1 + math.Clamp( pos:Distance( self.LastPos ) / 128, 0, 0.2 ), 0 )
+
+			self.SoundLoop:ChangeVolume( 0.1 + math.Clamp( pos:Distance( self.LastPos ) / 128, 0, soundMask * 0.9 ), 0 )
 		end
 		self.LastPos = pos
 	end

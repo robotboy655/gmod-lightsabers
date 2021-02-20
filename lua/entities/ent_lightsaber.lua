@@ -97,10 +97,10 @@ function ENT:OnEnabled()
 	if ( CLIENT ) then return end
 	if ( self:WaterLevel() > 2 && !self:GetWorksUnderwater() ) then return end
 
-	if ( !self:GetEnabled() && self.OnSound ) then self:EmitSound( self.OnSound ) end
+	if ( !self:GetEnabled() && self.OnSound ) then self:EmitSound( self.OnSound, nil, nil, 0.4 ) end
 
 	self.SoundLoop = CreateSound( self, Sound( self.LoopSound ) )
-	if ( self.SoundLoop ) then self.SoundLoop:Play() end
+	if ( self.SoundLoop ) then self.SoundLoop:Play() self.SoundLoop:ChangeVolume( 0, 0 ) end
 
 	self.SoundSwing = CreateSound( self, Sound( self.SwingSound ) )
 	if ( self.SoundSwing ) then self.SoundSwing:Play() self.SoundSwing:ChangeVolume( 0, 0 ) end
@@ -115,7 +115,7 @@ function ENT:OnDisabled( bRemove )
 		return
 	end
 
-	if ( self:GetEnabled() && self.OffSound ) then self:EmitSound( self.OffSound ) end
+	if ( self:GetEnabled() && self.OffSound ) then self:EmitSound( self.OffSound, nil, nil, 0.4 ) end
 
 	if ( self.SoundLoop ) then self.SoundLoop:Stop() self.SoundLoop = nil end
 	if ( self.SoundSwing ) then self.SoundSwing:Stop() self.SoundSwing = nil end
@@ -287,11 +287,14 @@ function ENT:Think()
 		self.LastAng = ang
 	end]]
 
+	local s = 1
+	if ( self:GetBladeLength() < self:GetMaxLength() ) then s = 0 end
+
 	if ( self.SoundLoop ) then
 		local pos = pos + ang * self:GetBladeLength()
 		if ( self.LastPos != pos ) then
 			self.LastPos = self.LastPos or pos
-			self.SoundLoop:ChangeVolume( 0.1 + math.Clamp( pos:Distance( self.LastPos ) / 32, 0, 0.2 ), 0 )
+			self.SoundLoop:ChangeVolume( 0.1 + math.Clamp( pos:Distance( self.LastPos ) / 128, 0, s * 0.9 ), 0 )
 			--self.SoundLoop:ChangeVolume( 0.1 + math.Clamp( pos:Distance( self.LastPos ) / 32, 0, 0.2 ), 0 )
 			--self.SoundLoop:ChangeVolume( 1 - math.min( pos:Distance( self.LastPos ) / 16, 1 ), 0 )
 			--self.SoundLoop:ChangeVolume( self:GetBladeLength() / self:GetMaxLength(), 0 )
