@@ -1,4 +1,5 @@
-"Sprite" {
+"Sprite"
+{
 	"$basetexture" "lightsaber/hard_light"
 
 	"$spriteorientation" "vp_parallel"

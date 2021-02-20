@@ -181,53 +181,63 @@ local HardLaserTrailEndInner = Material( "lightsaber/hard_light_trail_inner" )]]
 local gOldBladePositions = {}
 local gTrailLength = 1
 
-function rb655_RenderBlade( pos, dir, len, maxlen, width, color, black_inner, eid, underwater, quillon, bladeNum )
-	--render.DrawLine( pos + dir * len*-2, pos + dir * len*2, color, true )
+function rb655_RenderBlade( pos, dir, length, maxlen, width, color, black_inner, eid, underwater, quillon, bladeNum )
+	--render.DrawLine( pos + dir * length*-2, pos + dir * length*2, color, true )
 
 	quillon = quillon or false
 	bladeNum = bladeNum or 1
 
 	if ( quillon ) then
-		len = rb655_CalculateQuillonLength( len, maxlen )
+		length = rb655_CalculateQuillonLength( length, maxlen )
 		maxlen = rb655_CalculateQuillonMaxLength( maxlen )
+		width = rb655_CalculateQuillonWidth( width )
 	end
 
-	if ( len <= 0 ) then rb655_SaberClean( eid, bladeNum ) return end
+	if ( length <= 0 ) then rb655_SaberClean( eid, bladeNum ) return end
 
 	if ( underwater ) then
 		local ed = EffectData()
 		ed:SetOrigin( pos )
 		ed:SetNormal( dir )
-		ed:SetRadius( len )
+		ed:SetRadius( length )
 		util.Effect( "rb655_saber_underwater", ed )
 	end
 
 	local inner_color = color_white
 	if ( black_inner ) then inner_color = Color( 0, 0, 0 ) end
 
+	local bladeS = 1
+	if ( quillon ) then
+		bladeS = 0.25
+	end
+
 	render.SetMaterial( HardLaser )
-	render.DrawBeam( pos, pos + dir * len, width * 1.3, 1, 0.01, color )
+	render.DrawBeam( pos, pos + dir * ( length * 1.01 ), width * 1.6, bladeS, 0.01, color )
 
 	render.SetMaterial( HardLaserInner )
-	render.DrawBeam( pos, pos + dir * len, width * 1.2, 1, 0.01, inner_color )
+	render.DrawBeam( pos, pos + dir * length, width * 1, bladeS, 0.01, inner_color )
 
 	-- Dynamic light
 	if ( !quillon ) then
 		local SaberLight = DynamicLight( eid + 1000 * bladeNum )
 		if ( SaberLight ) then
-			SaberLight.Pos = pos + dir * ( len / 2 )
+			SaberLight.Pos = pos + dir * ( length / 2 )
 			SaberLight.r = color.r
 			SaberLight.g = color.g
 			SaberLight.b = color.b
 			SaberLight.Brightness = 0.6
-			SaberLight.Size = 176 * ( len / maxlen )
+			SaberLight.Size = 176 * ( length / maxlen )
 			SaberLight.Decay = 0
 			SaberLight.DieTime = CurTime() + 0.1
 		end
 	end
 
+	if ( quillon ) then
+		length = length * 0.93
+	end
+
 	local prevB = pos
-	local prevT = pos + dir * len
+	local prevT = pos + dir * length
 
 	if ( !gOldBladePositions[ eid ] ) then gOldBladePositions[ eid ] = {} end
 	if ( !gOldBladePositions[ eid ][ bladeNum ] ) then gOldBladePositions[ eid ][ bladeNum ] = {} end
@@ -270,10 +280,11 @@ function rb655_SaberClean( eid, bladeNum )
 end
 
 -- Extremely ugly hack workaround :(
-function rb655_ProcessBlade( eid, pos, dir, len, bladeNum )
+function rb655_ProcessBlade( eid, pos, dir, len, bladeNum, quillon )
 	if ( !gOldBladePositions[ eid ] ) then gOldBladePositions[ eid ] = {} end
 	if ( !gOldBladePositions[ eid ][ bladeNum ] ) then gOldBladePositions[ eid ][ bladeNum ] = {} end
 
+	if ( quillon ) then len = len * 0.93 end
 	local hax = gOldBladePositions[ eid ][ bladeNum ]
 	for i = 0, gTrailLength - 1 do
 		hax[ gTrailLength - i ] = hax[ gTrailLength - i - 1 ]
@@ -284,13 +295,17 @@ function rb655_ProcessBlade( eid, pos, dir, len, bladeNum )
 end
 
 function rb655_CalculateQuillonMaxLength( maxLength )
-	return maxLength / 7
+	return maxLength / 6
+end
+
+function rb655_CalculateQuillonWidth( width )
+	return width * 0.8
 end
 
 function rb655_CalculateQuillonLength( length, maxLength )
-	local len = rb655_CalculateQuillonMaxLength( length )
+	local qlen = rb655_CalculateQuillonMaxLength( length )
 	local maxLen = rb655_CalculateQuillonMaxLength( maxLength )
-	return math.Clamp( maxLen - ( maxLength - length ), 0, len )
+	return math.Clamp( maxLen - ( maxLength - length ), 0, qlen )
 end
 
 function rb655_ProcessLightsaberEntity( ent )
@@ -313,7 +328,7 @@ function rb655_ProcessLightsaberEntity( ent )
 		if ( quillonNum && ent:LookupAttachment( "quillon" .. quillonNum ) > 0 ) then
 			blades = blades + 1
 			local pos, ang = ent:GetSaberPosAng( quillonNum, true )
-			rb655_ProcessBlade( ent:EntIndex(), pos, ang, rb655_CalculateQuillonLength( ent:GetBladeLength(), ent:GetMaxLength() ), blades )
+			rb655_ProcessBlade( ent:EntIndex(), pos, ang, rb655_CalculateQuillonLength( ent:GetBladeLength(), ent:GetMaxLength() ), blades, true )
 		end
 	end
 
