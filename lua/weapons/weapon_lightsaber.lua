@@ -637,11 +637,11 @@ function SWEP:Deploy()
 
 	if ( ply:IsPlayer() && !ply:IsBot() && !self.WeaponSynched && SERVER && GAMEMODE.IsSandboxDerived ) then
 		self:LoadToolValues( ply )
-	end
 
-	-- We only want to do this in Sandbox, not any derivatives
-	if ( GAMEMODE.Name == "Sandbox" ) then
-		ply:SendLua( 'GAMEMODE:AddHint( "LightsaberCustomizationHint", 7 )' )
+		-- We only want to do this in Sandbox, not any derivatives
+		if ( GAMEMODE.Name == "Sandbox" ) then
+			ply:SendLua( 'GAMEMODE:AddHint( "LightsaberCustomizationHint", 7 )' )
+		end
 	end
 
 	if ( self:GetEnabled() ) then self:OnEnabled( true ) else self:SetHoldType( "normal" ) end
