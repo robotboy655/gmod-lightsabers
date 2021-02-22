@@ -639,6 +639,11 @@ function SWEP:Deploy()
 		self:LoadToolValues( ply )
 	end
 
+	-- We only want to do this in Sandbox, not any derivatives
+	if ( GAMEMODE.Name == "Sandbox" ) then
+		ply:SendLua( 'GAMEMODE:AddHint( "LightsaberCustomizationHint", 7 )' )
+	end
+
 	if ( self:GetEnabled() ) then self:OnEnabled( true ) else self:SetHoldType( "normal" ) end
 
 	if ( CLIENT ) then return end

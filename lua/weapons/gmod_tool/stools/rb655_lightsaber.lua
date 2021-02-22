@@ -339,6 +339,7 @@ language.Add( "Cleaned_ent_lightsabers", "Cleaned up all Lightsabers" )
 language.Add( "SBoxLimit_ent_lightsabers", "You've hit the Lightsaber limit!" )
 language.Add( "Undone_ent_lightsaber", "Lightsaber undone" )
 language.Add( "max_ent_lightsabers", "Max Lightsabers" )
+language.Add( "Hint_LightsaberCustomizationHint", "You can customize your Lightsaber in the Lightsabers tool" )
 
 language.Add( "tool.rb655_lightsaber.preset1", "Darth Maul's Saberstaff" )
 language.Add( "tool.rb655_lightsaber.preset2", "Darth Maul's Lightsaber" )
