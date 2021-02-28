@@ -105,7 +105,7 @@ function ENT:OnEnabled()
 	self.SoundSwing = CreateSound( self, Sound( self.SwingSound ) )
 	if ( self.SoundSwing ) then self.SoundSwing:Play() self.SoundSwing:ChangeVolume( 0, 0 ) end
 
-	self.SoundHit = CreateSound( self, Sound( self.HitSound || "lightsaber/saber_hit.wav" ) )
+	self.SoundHit = CreateSound( self, Sound( self.HitSound or "lightsaber/saber_hit.wav" ) )
 	if ( self.SoundHit ) then self.SoundHit:Play() self.SoundHit:ChangeVolume( 0, 0 ) end
 end
 
@@ -271,7 +271,7 @@ function ENT:Think()
 
 	--[[if ( self.SoundSwing ) then
 		--local ang = self:GetAngles()
-		local dist1 = pos:Distance( self.Owner:GetShootPos() ) 
+		local dist1 = pos:Distance( self.Owner:GetShootPos() )
 		local dist2 = (pos+ ang * self:GetBladeLength()):Distance( self.Owner:GetShootPos() )
 		local val = (dist1 - dist2) / self:GetBladeLength()
 		print(val,CurTime())
@@ -279,8 +279,8 @@ function ENT:Think()
 			self.LastAng = self.LastAng or ang
 			self.SoundSwing:ChangeVolume( math.Clamp( val, 0, 1 ), 0 )
 			--self.SoundSwing:ChangeVolume( math.Clamp( ang:Distance( self.LastAng ) / 2, 0, 1 ), 0 )
-			
-			
+
+
 			--self.SoundSwing:ChangeVolume( math.Rand( 0, 1 ), 0 ) -- For some reason if I spam always 1, the sound doesn't loop
 			--self.SoundSwing:ChangeVolume( math.min( pos:Distance( self.LastPos ) / 16, 1 ), 0 )
 		--end
@@ -291,15 +291,15 @@ function ENT:Think()
 	if ( self:GetBladeLength() < self:GetMaxLength() ) then s = 0 end
 
 	if ( self.SoundLoop ) then
-		local pos = pos + ang * self:GetBladeLength()
-		if ( self.LastPos != pos ) then
-			self.LastPos = self.LastPos or pos
-			self.SoundLoop:ChangeVolume( 0.1 + math.Clamp( pos:Distance( self.LastPos ) / 128, 0, s * 0.9 ), 0 )
-			--self.SoundLoop:ChangeVolume( 0.1 + math.Clamp( pos:Distance( self.LastPos ) / 32, 0, 0.2 ), 0 )
-			--self.SoundLoop:ChangeVolume( 1 - math.min( pos:Distance( self.LastPos ) / 16, 1 ), 0 )
+		local spos = pos + ang * self:GetBladeLength()
+		if ( self.LastPos != spos ) then
+			self.LastPos = self.LastPos or spos
+			self.SoundLoop:ChangeVolume( 0.1 + math.Clamp( spos:Distance( self.LastPos ) / 128, 0, s * 0.9 ), 0 )
+			--self.SoundLoop:ChangeVolume( 0.1 + math.Clamp( spos:Distance( self.LastPos ) / 32, 0, 0.2 ), 0 )
+			--self.SoundLoop:ChangeVolume( 1 - math.min( spos:Distance( self.LastPos ) / 16, 1 ), 0 )
 			--self.SoundLoop:ChangeVolume( self:GetBladeLength() / self:GetMaxLength(), 0 )
 		end
-		self.LastPos = pos
+		self.LastPos = spos
 	end
 
 	self:NextThink( CurTime() )

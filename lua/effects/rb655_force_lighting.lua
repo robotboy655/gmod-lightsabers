@@ -3,6 +3,7 @@ local function GetRandomPositionInBox( mins, maxs, ang )
 	return ang:Up() * math.random( mins.z, maxs.z ) + ang:Right() * math.random( mins.y, maxs.y ) + ang:Forward() * math.random( mins.x, maxs.x )
 end
 
+--[[
 local function GenerateLighting( from, to, deviations, power )
 	local start = from
 	if ( isentity( start ) ) then start = from:GetPos() end
@@ -30,7 +31,7 @@ local function GenerateLighting( from, to, deviations, power )
 		segments = newsegs
 	end
 	return segments
-end
+end]]
 
 local function GenerateLightingSegs( from, to, deviations, segs )
 	local start = from
@@ -75,39 +76,40 @@ local function GenerateLightingSegs( from, to, deviations, segs )
 	return segments
 end
 
+local lightning_mat = Material( "cable/blue_elec" )
+--[[
 local mats = {
 	(Material( "cable/blue_elec" )),
-	/*(Material( "cable/hydra" )),
+	(Material( "cable/hydra" )),
 	(Material( "cable/redlaser" )),
 	(Material( "cable/crystal_beam1" )),
 	(Material( "cable/physbeam" )),
 	(Material( "cable/smoke" )),
-	(Material( "cable/xbeam" )),*/
-}
+	(Material( "cable/xbeam" )),
+}]]
 
 local segments = {}
 --local n = 0
 local tiem = .2
 hook.Add( "PostDrawTranslucentRenderables", "", function()
 	--if ( #segments < 1 || n < CurTime() ) then
-		--
-		/*for i = 0, 1 do
+		--[[for i = 0, 1 do
 			table.insert( segments, {
 				segs = GenerateLighting( table.Random( ents.FindByClass( "prop_physics" ) ), table.Random( ents.FindByClass( "prop_physics" ) ), math.random( 10, 20 ), 3 ),
 				mat = table.Random( mats ),
 				time = CurTime() + tiem,
 				w = math.random( 20, 50 )
 			} )
-		end*/
+		end]]
 		--n = CurTime() + .01
 	--end
 
 	for id, t in pairs( segments ) do
 		if ( t.time < CurTime() ) then table.remove( segments, id ) continue end
 		render.SetMaterial( t.mat )
-		for id, seg in pairs( t.segs ) do
+		for id2, seg in pairs( t.segs ) do
 			render.DrawBeam( seg[1], seg[2], ( math.max( t.startpos:Distance( t.endpos ) - seg[1]:Distance( t.endpos ), 20) / ( t.startpos:Distance( t.endpos ) ) * t.w ) * ( (t.time - CurTime() ) / tiem ), 0, seg[1]:Distance( seg[2] ) / 25, Color( 255, 255, 255 ) )
-			--render.DrawBeam( seg[1], seg[2], (id / #t.segs * t.w ) * ((t.time - CurTime()) / tiem), 0, seg[1]:Distance( seg[2] ) / 25, Color( 255, 255, 255 ) )
+			--render.DrawBeam( seg[1], seg[2], (id2 / #t.segs * t.w ) * ((t.time - CurTime()) / tiem), 0, seg[1]:Distance( seg[2] ) / 25, Color( 255, 255, 255 ) )
 		end
 	end
 end )
@@ -122,7 +124,7 @@ function EFFECT:Init( data )
 	table.insert( segments, {
 		--segs = GenerateLighting( pos, ent, math.random( 10, 20 ), 3 ),
 		segs = GenerateLightingSegs( pos, ent, math.random( 10, 20 ), pos:Distance( ent:GetPos() ) / 48 ), --math.random( 5, 10 ) ),
-		mat = table.Random( mats ),
+		mat = lightning_mat,--table.Random( mats ),
 		time = CurTime() + tiem,
 		w = math.random( 20, 50 ),
 		startpos = pos,
@@ -135,11 +137,11 @@ function EFFECT:Think()
 end
 
 function EFFECT:Render()
-	/*for id, t in pairs( segments ) do
+	--[[for id, t in pairs( segments ) do
 		if (t.time < CurTime() ) then table.remove( segments, id ) continue end
 		render.SetMaterial( t.mat )
 		for id, seg in pairs( t.segs ) do
 			render.DrawBeam( seg[1], seg[2], (id / #t.segs * t.w ) * ((t.time - CurTime()) / tiem), 0, seg[1]:Distance( seg[2] ) / 25, Color( 255, 255, 255 ) )
 		end
-	end*/
+	end]]
 end

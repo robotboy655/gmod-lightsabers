@@ -53,7 +53,7 @@ end
 
 -------------------------------------------------- FORCE POWERS --------------------------------------------------
 
-rb655_gForcePowers = /*rb655_gForcePowers ||*/ {}
+rb655_gForcePowers = --[[rb655_gForcePowers ||]] {}
 
 function rb655_AddForcePower( t )
 	table.insert( rb655_gForcePowers, t )
@@ -143,7 +143,7 @@ rb655_AddForcePower( {
 
 		local maxdist = 128 * self._ForceRepulse
 
-		for i, e in pairs( ents.FindInSphere( self.Owner:GetPos(), maxdist ) ) do
+		for _, e in pairs( ents.FindInSphere( self.Owner:GetPos(), maxdist ) ) do
 			if ( e == self.Owner ) then continue end
 
 			local dist = self.Owner:GetPos():Distance( e:GetPos() )
@@ -283,7 +283,7 @@ rb655_AddForcePower( {
 	end
 } )
 
-/*
+--[[
 rb655_AddForcePower( {
 	name = "Force Push",
 	icon = "P",
@@ -348,7 +348,7 @@ rb655_AddForcePower( {
 
 		self:SetNextAttack( 0.1 )
 	end
-} )*/
+} )]]
 
 function rb655_GetForcePowers()
 	return rb655_gForcePowers
@@ -434,7 +434,7 @@ function rb655_LS_DoDamage( tr, wep )
 		dmginfo:SetDamage( 25 )
 	end
 
-	if ( ( !ent:IsPlayer() or !wep:IsWeapon() ) || IsKickbackAllowed() ) then
+	if ( ( !ent:IsPlayer() or !wep:IsWeapon() ) or IsKickbackAllowed() ) then
 		-- This causes the damage to apply force the the target, which we do not want
 		-- For now, only apply it to the SENT
 		dmginfo:SetInflictor( wep )

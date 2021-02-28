@@ -27,7 +27,7 @@ function EFFECT:Init( data )
 
 			particle:SetColor( 255, 255, 255 )
 			particle:SetAngleVelocity( Angle( math.Rand( -180, 180 ), math.Rand( -180, 180 ), math.Rand( -180, 180 ) ) )
-			//particle:SetLighting( true )
+			--particle:SetLighting( true )
 		end
 	end
 

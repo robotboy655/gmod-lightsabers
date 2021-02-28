@@ -24,14 +24,14 @@ I can't possibly provide support for all the edits and I can't know what your ed
 AddCSLuaFile()
 
 if ( SERVER ) then
-	CreateConVar( "rb655_lightsaber_hiltonbelt", "1" )
+	local hob_cvar = CreateConVar( "rb655_lightsaber_hiltonbelt", "1" )
 
 	cvars.AddChangeCallback( "rb655_lightsaber_hiltonbelt", function( cvar, old, new )
 		SetGlobalBool( "rb655_lightsaber_hiltonbelt", new != "0" )
 	end, "rb655_lightsaber_hiltonbelt" )
 
 	hook.Add( "PlayerInitialSpawn", "rb655_lightsaber_hiltonbelt", function()
-		SetGlobalBool( "rb655_lightsaber_hiltonbelt", GetConVarNumber( "rb655_lightsaber_hiltonbelt" ) )
+		SetGlobalBool( "rb655_lightsaber_hiltonbelt", hob_cvar:GetFloat() )
 	end )
 
 	return

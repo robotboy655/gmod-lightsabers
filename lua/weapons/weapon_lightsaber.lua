@@ -72,7 +72,7 @@ function SWEP:PlayWeaponSound( snd, vol )
 	if ( CLIENT ) then return end
 	if ( IsValid( self:GetOwner() ) && IsValid( self:GetOwner():GetActiveWeapon() ) && self:GetOwner():GetActiveWeapon() != self ) then return end
 
-	if ( snd == self:GetOnSound() || snd == self:GetOffSound() ) then vol = 0.4 end
+	if ( snd == self:GetOnSound() or snd == self:GetOffSound() ) then vol = 0.4 end
 
 	if ( !IsValid( self.Owner ) ) then return self:EmitSound( snd, nil, nil, vol ) end
 	self.Owner:EmitSound( snd, nil, nil, vol )
@@ -283,7 +283,7 @@ function SWEP:LoadToolValues( ply )
 	self.WeaponSynched = true
 
 	-- Start it if we spawned it using the spawnmenu!
-	if ( !IsValid( self.Owner ) || self.Owner:IsPlayer() ) then
+	if ( !IsValid( self.Owner ) or self.Owner:IsPlayer() ) then
 		-- Gotta wait a tick so we don't play double sounds!
 		timer.Simple( 0, function() if ( !IsValid( self ) ) then return end self:SetEnabled( true ) end )
 	end
@@ -403,7 +403,7 @@ function SWEP:SetupWeaponHoldTypeForAI( t )
 	self.ActivityTranslateAI[ ACT_SPECIAL_ATTACK1 ]			= ACT_RANGE_ATTACK_THROW
 
 
-	self.ActivityTranslateAI[ ACT_RANGE_AIM_LOW ]			 = ACT_IDLE_ANGRY_MELEE
+	self.ActivityTranslateAI[ ACT_RANGE_AIM_LOW ]			= ACT_IDLE_ANGRY_MELEE
 	self.ActivityTranslateAI[ ACT_COVER_LOW ]				= ACT_IDLE_ANGRY_MELEE
 
 	self.ActivityTranslateAI[ ACT_WALK ]					= ACT_WALK
@@ -438,7 +438,7 @@ function SWEP:SetupWeaponHoldTypeForAI( t )
 	self.ActivityTranslateAI[ ACT_MELEE_ATTACK2 ]			= ACT_MELEE_ATTACK1
 	self.ActivityTranslateAI[ ACT_SPECIAL_ATTACK1 ]			= ACT_MELEE_ATTACK1
 
-	self.ActivityTranslateAI[ ACT_RANGE_AIM_LOW ]			 = ACT_IDLE_SHOTGUN
+	self.ActivityTranslateAI[ ACT_RANGE_AIM_LOW ]			= ACT_IDLE_SHOTGUN
 	self.ActivityTranslateAI[ ACT_COVER_LOW ]				= ACT_IDLE_SHOTGUN
 
 	self.ActivityTranslateAI[ ACT_WALK ]					= ACT_WALK_UNARMED
@@ -573,15 +573,15 @@ end
 -- --------------------------------------------------------- Drop / Deploy / Holster / Enable / Disable --------------------------------------------------------- --
 
 function SWEP:OnEnabled( bDeploy )
-	if ( ( !self:GetEnabled() or bDeploy ) and IsValid( self.Owner ) ) then self:PlayWeaponSound( self:GetOnSound() ) end
+	if ( ( !self:GetEnabled() or bDeploy ) && IsValid( self.Owner ) ) then self:PlayWeaponSound( self:GetOnSound() ) end
 
-	if ( CLIENT or ( self:GetEnabled() and !bDeploy ) ) then return end
+	if ( CLIENT or ( self:GetEnabled() && !bDeploy ) ) then return end
 
 	self:SetHoldType( self:GetTargetHoldType() )
 	timer.Remove( "rb655_ls_ht" .. self:EntIndex() )
 
 	-- Don't (re)create the sounds if we don't have an owner or we already have the sounds
-	if ( !IsValid( self.Owner ) || self.SoundLoop ) then return end
+	if ( !IsValid( self.Owner ) or self.SoundLoop ) then return end
 
 	self.SoundLoop = CreateSound( self.Owner, Sound( self.LoopSound ) )
 	if ( self.SoundLoop ) then self.SoundLoop:Play() self.SoundLoop:ChangeVolume( 0, 0 ) end
@@ -589,7 +589,7 @@ function SWEP:OnEnabled( bDeploy )
 	self.SoundSwing = CreateSound( self.Owner, Sound( self.SwingSound ) )
 	if ( self.SoundSwing ) then self.SoundSwing:Play() self.SoundSwing:ChangeVolume( 0, 0 ) end
 
-	self.SoundHit = CreateSound( self.Owner, Sound( self.HitSound || "lightsaber/saber_hit.wav" ) )
+	self.SoundHit = CreateSound( self.Owner, Sound( self.HitSound or "lightsaber/saber_hit.wav" ) )
 	if ( self.SoundHit ) then self.SoundHit:Play() self.SoundHit:ChangeVolume( 0, 0 ) end
 end
 
@@ -640,7 +640,7 @@ function SWEP:Deploy()
 
 		-- We only want to do this in Sandbox, not any derivatives
 		if ( GAMEMODE.Name == "Sandbox" ) then
-			ply:SendLua( 'GAMEMODE:AddHint( "LightsaberCustomizationHint", 7 )' )
+			ply:SendLua( [[GAMEMODE:AddHint( "LightsaberCustomizationHint", 7 )]] )
 		end
 	end
 
@@ -930,7 +930,7 @@ function SWEP:TranslateActivity( act )
 		return KnifeHoldType[ act ]
 	end
 
-	if ( self.ActivityTranslate[ act ] != nil ) then return self.ActivityTranslate[ act ]end
+	if ( self.ActivityTranslate[ act ] != nil ) then return self.ActivityTranslate[ act ] end
 	return -1
 end
 
@@ -1164,7 +1164,7 @@ end
 
 local patched = {}
 local function patchCalcViewHook( str )
-	if ( !isstring( str ) || patched[ str ] || str == "111!!!_rb655_lightsaber_3rdperson" ) then return end
+	if ( !isstring( str ) or patched[ str ] or str == "111!!!_rb655_lightsaber_3rdperson" ) then return end
 	patched[ str ] = true
 
 	local originalFunc = hook.GetTable()[ "CalcView" ][ str ]
@@ -1266,7 +1266,7 @@ end
 local Color_White = Color( 255, 255, 255 )
 local Color_BLU = Color( 0, 128, 255 )
 local ForceBar = 100
-local function DrawForceSelectionHUD( ForceSelectEnabled, Force, MaxForce, SelectedPower, ForcePowers )
+local function DrawForceSelectionHUD( ForceSelectionEnabled, Force, MaxForce, SelectedPower, ForcePowers )
 
 	local icon = 52
 	local gap = 5
@@ -1274,7 +1274,7 @@ local function DrawForceSelectionHUD( ForceSelectEnabled, Force, MaxForce, Selec
 	local bar = 4
 	local bar2 = 16
 
-	if ( ForceSelectEnabled ) then
+	if ( ForceSelectionEnabled ) then
 		icon = 128
 		bar = 8
 		bar2 = 24
@@ -1325,7 +1325,7 @@ local function DrawForceSelectionHUD( ForceSelectEnabled, Force, MaxForce, Selec
 			draw.SimpleText( t.icon or "", "SelectedForceType", x2, math.floor( y + icon / 2 ), Color_White, 1, 1 )
 		end
 
-		if ( ForceSelectEnabled ) then
+		if ( ForceSelectionEnabled ) then
 			draw.SimpleText( ( input.LookupBinding( "slot" .. id ) or "<NOT BOUND>" ):upper(), "SelectedForceHUD", x + gap, y + gap, Color_White )
 		end
 		if ( SelectedPower == id ) then
@@ -1346,7 +1346,7 @@ local function DrawForceSelectionHUD( ForceSelectEnabled, Force, MaxForce, Selec
 
 	local selectedForcePower = ForcePowers[ SelectedPower ]
 
-	if ( selectedForcePower && ForceSelectEnabled ) then
+	if ( selectedForcePower && ForceSelectionEnabled ) then
 
 		-- Description
 
@@ -1380,7 +1380,7 @@ local function DrawForceSelectionHUD( ForceSelectEnabled, Force, MaxForce, Selec
 
 	----------------------------------- Press F to Select -----------------------------------
 
-	if ( !ForceSelectEnabled ) then
+	if ( !ForceSelectionEnabled ) then
 		surface.SetFont( "SelectedForceHUD" )
 		local txt = "Press " .. ( input.LookupBinding( "impulse 100" ) or "<NOT BOUND>" ):upper() .. " to toggle Force selection"
 		local tW, tH = surface.GetTextSize( txt )
