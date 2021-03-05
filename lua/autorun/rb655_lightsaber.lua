@@ -27,11 +27,14 @@ AddCSLuaFile()
 
 -- game.AddDecal( "LSScorch", "effects/rb655_scorch" ) -- Why doesn't it work?
 
-function rb655_DrawHit( pos, dir )
 	local effectdata = EffectData()
 	effectdata:SetOrigin( pos )
 	effectdata:SetNormal( dir )
 	util.Effect( "StunstickImpact", effectdata, true, true )
+function rb655_DrawHit( trace, isBack )
+	local pos = trace.HitPos
+	local dir = trace.HitNormal
+
 
 	--util.Decal( "LSScorch", pos + dir, pos - dir )
 	util.Decal( "FadingScorch", pos + dir, pos - dir )

@@ -846,7 +846,7 @@ function SWEP:Think()
 	end
 
 	if ( ( isTrace1Hit or isTrace2Hit ) && self.SoundHit ) then
-		self.SoundHit:ChangeVolume( math.Rand( 0.1, 0.1 ), 0 )
+		self.SoundHit:ChangeVolume( 0.1, 0 )
 	elseif ( self.SoundHit ) then
 		self.SoundHit:ChangeVolume( 0, 0 )
 	end
@@ -883,12 +883,12 @@ end
 function SWEP:DrawHitEffects( trace, traceBack )
 	if ( self:GetBladeLength() <= 0 ) then return end
 
-	if ( trace.Hit ) then
-		rb655_DrawHit( trace.HitPos, trace.HitNormal )
+	if ( trace.Hit && !trace.StartSolid ) then
+		rb655_DrawHit( trace )
 	end
 
-	if ( traceBack && traceBack.Hit ) then
-		rb655_DrawHit( traceBack.HitPos, traceBack.HitNormal )
+	if ( traceBack && traceBack.Hit && !traceBack.StartSolid ) then
+		rb655_DrawHit( traceBack, true )
 	end
 end
 

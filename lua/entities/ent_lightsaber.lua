@@ -255,7 +255,7 @@ function ENT:Think()
 	end
 
 	if ( self.SoundHit ) then
-		if ( hit ) then self.SoundHit:ChangeVolume( math.Rand( 0.1, 0.5 ), 0 ) else self.SoundHit:ChangeVolume( 0, 0 ) end
+		if ( hit ) then self.SoundHit:ChangeVolume( 0.1, 0 ) else self.SoundHit:ChangeVolume( 0, 0 ) end
 	end
 
 	if ( self.SoundSwing ) then
@@ -314,13 +314,28 @@ function ENT:BladeThink( startpos, dir )
 		--[[mins = Vector( -1, -1, -1 ) * self:GetBladeWidth() / 2,
 		maxs = Vector( 1, 1, 1 ) * self:GetBladeWidth() / 2]]
 	} )
+	local traceBack = util.TraceLine( {
+		start = startpos + dir * self:GetBladeLength(),
+		endpos = startpos,
+		filter = self,
+		--mins = Vector( -1, -1, -1 ) * self:GetBladeWidth() / 8,
+		--maxs = Vector( 1, 1, 1 ) * self:GetBladeWidth() / 8
+	} )
 
-	if ( trace.Hit ) then
-		rb655_DrawHit( trace.HitPos, trace.HitNormal )
+	local hit = false
+	if ( trace.Hit && !trace.StartSolid && !trace.HitSky ) then
+		rb655_DrawHit( trace )
 		rb655_LS_DoDamage( trace, self )
+		hit = true
 	end
 
-	return trace.Hit
+	if ( traceBack.Hit && !traceBack.StartSolid && !traceBack.HitSky ) then
+		rb655_DrawHit( traceBack, true )
+		rb655_LS_DoDamage( traceBack, self )
+		hit = true
+	end
+
+	return hit
 end
 
 function ENT:Use( activator, caller, useType, value )
