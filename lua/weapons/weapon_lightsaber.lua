@@ -68,6 +68,13 @@ list.Add( "NPCUsableWeapons", { class = "weapon_lightsaber", title = SWEP.PrintN
 
 -- --------------------------------------------------------- Helper functions --------------------------------------------------------- --
 
+local function IsPlayerInWater( ply )
+	return ply.m_bInSwim
+end
+local function IsPlayerUnderWater( ply )
+	return ply:WaterLevel() > 2
+end
+
 function SWEP:PlayWeaponSound( snd, vol )
 	if ( CLIENT ) then return end
 	if ( IsValid( self:GetOwner() ) && IsValid( self:GetOwner():GetActiveWeapon() ) && self:GetOwner():GetActiveWeapon() != self ) then return end
@@ -479,7 +486,7 @@ function SWEP:NPC_ChaseEnemy()
 	if ( self.Owner:GetEnemy() == self.Owner ) then self.Owner:SetEnemy( NULL ) return end
 	if ( !self.CooldownTimer && self.Owner:GetEnemy():GetPos():Distance( self:GetPos() ) <= 70 ) then
 		self.Owner:SetSchedule( SCHED_MELEE_ATTACK1 )
-		self:NPCShoot_Primary( ShootPos, ShootDir )
+		self:NPCShoot_Primary()
 	end
 end
 
@@ -504,7 +511,7 @@ function SWEP:NPCThink()
 	self:Think()
 end
 
-function SWEP:NPCShoot_Primary( ShootPos, ShootDir )
+function SWEP:NPCShoot_Primary()
 	if ( !IsValid( self ) or !IsValid( self.Owner ) ) then return end
 	if ( !self.Owner:GetEnemy() ) then return end
 
@@ -555,7 +562,7 @@ end
 
 function SWEP:Reload()
 	if ( !self.Owner:KeyPressed( IN_RELOAD ) ) then return end
-	if ( self.Owner:WaterLevel() > 2 && !self:GetWorksUnderwater() ) then return end
+	if ( IsPlayerUnderWater( self.Owner ) && !self:GetWorksUnderwater() && !self:GetEnabled() ) then return end
 
 	self:SetEnabled( !self:GetEnabled() )
 end
@@ -762,7 +769,7 @@ function SWEP:Think()
 		self:SetLengthAnimation( math.Approach( self:GetLengthAnimation(), 1, FrameTime() * 10 ) )
 	end
 
-	if ( self:GetEnabled() && !self:GetWorksUnderwater() && self.Owner:WaterLevel() > 2 ) then
+	if ( self:GetEnabled() && !self:GetWorksUnderwater() && IsPlayerUnderWater( self.Owner ) ) then
 		self:SetEnabled( false )
 		--self:EmitSound( self:GetOffSound() )
 	end
@@ -926,7 +933,7 @@ function SWEP:TranslateActivity( act )
 
 	end
 
-	if ( self.Owner:WaterLevel() > 1 && self:GetEnabled() ) then
+	if ( IsPlayerInWater( self:GetOwner() ) && self:GetEnabled() ) then
 		return KnifeHoldType[ act ]
 	end
 
@@ -981,21 +988,21 @@ function SWEP:DrawWorldModelTranslucent()
 		if ( bladeNum && self:LookupAttachment( "blade" .. bladeNum ) > 0 ) then
 			blades = blades + 1
 			local pos, dir = self:GetSaberPosAng( bladeNum )
-			rb655_RenderBlade( pos, dir, self:GetBladeLength(), self:GetMaxLength(), self:GetBladeWidth(), clr, self:GetDarkInner(), self:EntIndex(), self:GetOwner():WaterLevel() > 2, false, blades )
+			rb655_RenderBlade( pos, dir, self:GetBladeLength(), self:GetMaxLength(), self:GetBladeWidth(), clr, self:GetDarkInner(), self:EntIndex(), IsPlayerUnderWater( self:GetOwner() ), false, blades )
 			bladesFound = true
 		end
 
 		if ( quillonNum && self:LookupAttachment( "quillon" .. quillonNum ) > 0 ) then
 			blades = blades + 1
 			local pos, dir = self:GetSaberPosAng( quillonNum, true )
-			rb655_RenderBlade( pos, dir, self:GetBladeLength(), self:GetMaxLength(), self:GetBladeWidth(), clr, self:GetDarkInner(), self:EntIndex(), self:GetOwner():WaterLevel() > 2, true, blades )
+			rb655_RenderBlade( pos, dir, self:GetBladeLength(), self:GetMaxLength(), self:GetBladeWidth(), clr, self:GetDarkInner(), self:EntIndex(), IsPlayerUnderWater( self:GetOwner() ), true, blades )
 		end
 
 	end
 
 	if ( !bladesFound ) then
 		local pos, dir = self:GetSaberPosAng()
-		rb655_RenderBlade( pos, dir, self:GetBladeLength(), self:GetMaxLength(), self:GetBladeWidth(), clr, self:GetDarkInner(), self:EntIndex(), self:GetOwner():WaterLevel() > 2 )
+		rb655_RenderBlade( pos, dir, self:GetBladeLength(), self:GetMaxLength(), self:GetBladeWidth(), clr, self:GetDarkInner(), self:EntIndex(), IsPlayerUnderWater( self:GetOwner() ) )
 	end
 end
 
@@ -1398,6 +1405,7 @@ local function DrawForceSelectionHUD( ForceSelectionEnabled, Force, MaxForce, Se
 end
 
 function SWEP:DrawHUD()
+
 	if ( !IsValid( self.Owner ) or self.Owner:GetViewEntity() != self.Owner or self.Owner:InVehicle() ) then return end
 
 	-----------------------------------
