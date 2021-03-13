@@ -362,14 +362,34 @@ function ENT:SpawnFunction( ply, tr )
 	ang:RotateAroundAxis( ang:Right(), 180 )
 	ent:SetAngles( ang )
 
+	local maxLen = ply:GetInfoNum( "rb655_lightsaber_bladel", 42 )
+	local bldWidth = ply:GetInfoNum( "rb655_lightsaber_bladew", 2 )
+	if ( !game.SinglePlayer() ) then
+		maxLen = math.Clamp( maxLen, 32, 64 )
+		bldWidth = math.Clamp( bldWidth, 2, 4 )
+	end
+	ent:SetMaxLength( maxLen )
+	ent:SetBladeWidth( bldWidth )
+
+	local mdl = ply:GetInfo( "rb655_lightsaber_model" )
+	local humSnd = ply:GetInfo( "rb655_lightsaber_humsound" )
+	if ( GetConVarNumber( "rb655_lightsaber_disallow_custom_content" ) > 0 && !game.SinglePlayer() ) then
+		if ( list.HasEntry( "LightsaberModels", mdl ) ) then ent:SetModel( mdl ) else ent:SetModel( "models/sgg/starwars/weapons/w_anakin_ep2_saber_hilt.mdl" ) end
+
+		for k, v in pairs( list.Get( "rb655_LightsaberHumSounds" ) ) do
+			if ( v.rb655_lightsaber_humsound == humSnd ) then ent.LoopSound = humSnd end
+		end
+
+		-- TODO: The rest of it
+	else
+		ent:SetModel( mdl )
+		ent.LoopSound = humSnd
+	end
+
 	-- Sync values from the tool
-	ent:SetMaxLength( math.Clamp( ply:GetInfoNum( "rb655_lightsaber_bladel", 42 ), 32, 64 ) )
 	ent:SetCrystalColor( Vector( ply:GetInfo( "rb655_lightsaber_red" ), ply:GetInfo( "rb655_lightsaber_green" ), ply:GetInfo( "rb655_lightsaber_blue" ) ) / 255 )
 	ent:SetDarkInner( ply:GetInfo( "rb655_lightsaber_dark" ) == "1" )
-	ent:SetModel( ply:GetInfo( "rb655_lightsaber_model" ) )
-	ent:SetBladeWidth( math.Clamp( ply:GetInfoNum( "rb655_lightsaber_bladew", 2 ), 2, 4 ) )
 
-	ent.LoopSound = ply:GetInfo( "rb655_lightsaber_humsound" )
 	ent.SwingSound = ply:GetInfo( "rb655_lightsaber_swingsound" )
 	ent.OnSound = ply:GetInfo( "rb655_lightsaber_onsound" )
 	ent.OffSound = ply:GetInfo( "rb655_lightsaber_offsound" )

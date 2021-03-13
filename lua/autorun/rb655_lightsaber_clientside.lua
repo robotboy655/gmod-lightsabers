@@ -24,7 +24,10 @@ I can't possibly provide support for all the edits and I can't know what your ed
 AddCSLuaFile()
 
 if ( SERVER ) then
-	local hob_cvar = CreateConVar( "rb655_lightsaber_hiltonbelt", "1" )
+
+	CreateConVar( "rb655_lightsaber_disallow_custom_content", "1", FCVAR_NONE, "Disallows usage of custom Lightsaber content (models) that is not present in the tool options when loading settings from the Sandbox tool." )
+
+	local hob_cvar = CreateConVar( "rb655_lightsaber_hiltonbelt", "1", FCVAR_NONE, "If set to non 0, enables the display of hilt model on the player's belt while the player has their lightsaber holstered." )
 
 	cvars.AddChangeCallback( "rb655_lightsaber_hiltonbelt", function( cvar, old, new )
 		SetGlobalBool( "rb655_lightsaber_hiltonbelt", new != "0" )

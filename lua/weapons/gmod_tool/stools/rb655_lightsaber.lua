@@ -24,20 +24,20 @@ I can't possibly provide support for all the edits and I can't know what your ed
 TOOL.Category = "Robotboy655"
 TOOL.Name = "#tool.rb655_lightsaber"
 
-TOOL.ClientConVar["model"] = "models/sgg/starwars/weapons/w_anakin_ep2_saber_hilt.mdl"
-TOOL.ClientConVar["red"] = "0"
-TOOL.ClientConVar["green"] = "127"
-TOOL.ClientConVar["blue"] = "255"
-TOOL.ClientConVar["bladew"] = "2"
-TOOL.ClientConVar["bladel"] = "42"
+TOOL.ClientConVar[ "model" ] = "models/sgg/starwars/weapons/w_anakin_ep2_saber_hilt.mdl"
+TOOL.ClientConVar[ "red" ] = "0"
+TOOL.ClientConVar[ "green" ] = "127"
+TOOL.ClientConVar[ "blue" ] = "255"
+TOOL.ClientConVar[ "bladew" ] = "2"
+TOOL.ClientConVar[ "bladel" ] = "42"
 
-TOOL.ClientConVar["dark"] = "0"
-TOOL.ClientConVar["starton"] = "1"
+TOOL.ClientConVar[ "dark" ] = "0"
+TOOL.ClientConVar[ "starton" ] = "1"
 
-TOOL.ClientConVar["humsound"] = "lightsaber/saber_loop1.wav"
-TOOL.ClientConVar["swingsound"] = "lightsaber/saber_swing1.wav"
-TOOL.ClientConVar["onsound"] = "lightsaber/saber_on1.wav"
-TOOL.ClientConVar["offsound"] = "lightsaber/saber_off1.wav"
+TOOL.ClientConVar[ "humsound" ] = "lightsaber/saber_loop1.wav"
+TOOL.ClientConVar[ "swingsound" ] = "lightsaber/saber_swing1.wav"
+TOOL.ClientConVar[ "onsound" ] = "lightsaber/saber_on1.wav"
+TOOL.ClientConVar[ "offsound" ] = "lightsaber/saber_off1.wav"
 
 cleanup.Register( "ent_lightsabers" )
 
@@ -83,6 +83,13 @@ if ( SERVER ) then
 	duplicator.RegisterEntityClass( "ent_lightsaber", MakeLightsaber, "model", "pos", "ang", "LoopSound", "SwingSound", "OnSound", "OffSound" )
 end
 
+function rb655_InvalidSettings()
+
+	GAMEMODE:AddNotify( "Cannot spawn Lightsaber with given tool settings.", NOTIFY_ERROR, 6 )
+	surface.PlaySound( "buttons/button10.wav" )
+
+end
+
 function TOOL:LeftClick( trace )
 	if ( trace.HitSky || !trace.HitPos ) then return false end
 	if ( IsValid( trace.Entity ) && ( trace.Entity:GetClass() == "ent_lightsaber" || trace.Entity:IsPlayer() ) ) then return false end
@@ -111,9 +118,31 @@ function TOOL:LeftClick( trace )
 
 	local bld_len = self:GetClientNumber( "bladel" )
 	local bld_w = self:GetClientNumber( "bladew" )
+
 	if ( !game.SinglePlayer() ) then
 		bld_len = math.Clamp( bld_len, 32, 64 )
 		bld_w = math.Clamp( bld_w, 2, 4 )
+	end
+
+	if ( GetConVarNumber( "rb655_lightsaber_disallow_custom_content" ) > 0 && !game.SinglePlayer() ) then
+		if ( !list.HasEntry( "LightsaberModels", mdl ) ) then
+			ply:SendLua( "rb655_InvalidSettings()" )
+			return
+		end
+
+		-- This is quite hefty
+		local humSnds = list.Get( "rb655_LightsaberHumSounds" )
+		local foundHum = false
+		for k, v in pairs( humSnds ) do
+			if ( v.rb655_lightsaber_humsound == hs ) then
+				foundHum = true
+			end
+		end
+
+		if ( !foundHum ) then
+			ply:SendLua( "rb655_InvalidSettings()" )
+			return
+		end
 	end
 
 	local ent_lightsaber
@@ -178,33 +207,19 @@ function TOOL:RightClick( trace )
 	if ( CLIENT ) then return true end
 
 	local ply = self:GetOwner()
-	--[[if ( IsValid( ply:GetEyeTrace().Entity ) && ply:GetEyeTrace().Entity:IsPlayer() ) then
-		ply = ply:GetEyeTrace().Entity
-	end]]
 
 	ply:StripWeapon( "weapon_lightsaber" )
 	local w = ply:Give( "weapon_lightsaber" )
 
-	local maxLen = ply:GetInfoNum( "rb655_lightsaber_bladel", 42 )
-	local bldWidth = ply:GetInfoNum( "rb655_lightsaber_bladew", 2 )
-	if ( !game.SinglePlayer() ) then
-		maxLen = math.Clamp( maxLen, 32, 64 )
-		bldWidth = math.Clamp( bldWidth, 2, 4 )
-	end
+	-- All the settings are loaded by the weapon
+	w:LoadToolValues( ply )
 
-	w:SetMaxLength( maxLen )
-	w:SetBladeWidth( bldWidth )
-	w:SetCrystalColor( Vector( ply:GetInfo( "rb655_lightsaber_red" ), ply:GetInfo( "rb655_lightsaber_green" ), ply:GetInfo( "rb655_lightsaber_blue" ) ) )
-	w:SetDarkInner( ply:GetInfo( "rb655_lightsaber_dark" ) == "1" )
-	w:SetWorldModel( ply:GetInfo( "rb655_lightsaber_model" ) )
+	timer.Simple( 0.2, function()
+		if ( !IsValid( w ) || !IsValid( ply ) ) then return end
 
-	w.LoopSound = ply:GetInfo( "rb655_lightsaber_humsound" )
-	w.SwingSound = ply:GetInfo( "rb655_lightsaber_swingsound" )
-	w:SetOnSound( ply:GetInfo( "rb655_lightsaber_onsound" ) )
-	w:SetOffSound( ply:GetInfo( "rb655_lightsaber_offsound" ) )
-	w:SetEnabled( tobool( ply:GetInfo( "rb655_lightsaber_starton" ) ) )
-
-	timer.Simple( 0.2, function() ply:SelectWeapon( "weapon_lightsaber" ) end )
+		w:SetEnabled( tobool( ply:GetInfo( "rb655_lightsaber_starton" ) ) )
+		ply:SelectWeapon( "weapon_lightsaber" )
+	end )
 
 	return true
 end

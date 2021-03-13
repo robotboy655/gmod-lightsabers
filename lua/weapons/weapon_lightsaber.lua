@@ -272,16 +272,30 @@ function SWEP:LoadToolValues( ply )
 		bldWidth = math.Clamp( bldWidth, 2, 4 )
 	end
 
+	-- This really needs to be better
+	local mdl = ply:GetInfo( "rb655_lightsaber_model" )
+	local humSnd = ply:GetInfo( "rb655_lightsaber_humsound" )
+	if ( GetConVarNumber( "rb655_lightsaber_disallow_custom_content" ) > 0 && !game.SinglePlayer() ) then
+		if ( list.HasEntry( "LightsaberModels", mdl ) ) then self:SetWorldModel( mdl ) end
+
+		for k, v in pairs( list.Get( "rb655_LightsaberHumSounds" ) ) do
+			if ( v.rb655_lightsaber_humsound == humSnd ) then self.LoopSound = humSnd end
+		end
+
+		-- TODO: The rest of it
+	else
+		self:SetWorldModel( mdl )
+		self.LoopSound = humSnd
+	end
+
 	self:SetMaxLength( maxLen )
 	self:SetBladeWidth( bldWidth )
 	self:SetCrystalColor( Vector( ply:GetInfo( "rb655_lightsaber_red" ), ply:GetInfo( "rb655_lightsaber_green" ), ply:GetInfo( "rb655_lightsaber_blue" ) ) )
 	self:SetDarkInner( ply:GetInfo( "rb655_lightsaber_dark" ) == "1" )
-	self:SetWorldModel( ply:GetInfo( "rb655_lightsaber_model" ) )
 	self:SetModel( self:GetWorldModel() )
 	self.WorldModel = self:GetWorldModel()
 	--self:PhysicsInit( SOLID_VPHYSICS )
 
-	self.LoopSound = ply:GetInfo( "rb655_lightsaber_humsound" )
 	self.SwingSound = ply:GetInfo( "rb655_lightsaber_swingsound" )
 	self:SetOnSound( ply:GetInfo( "rb655_lightsaber_onsound" ) )
 	self:SetOffSound( ply:GetInfo( "rb655_lightsaber_offsound" ) )
