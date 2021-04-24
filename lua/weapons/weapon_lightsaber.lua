@@ -761,7 +761,9 @@ end
 
 function SWEP:Think()
 	self.WorldModel = self:GetWorldModel()
-	self:SetModel( self:GetWorldModel() )
+	if ( !self:GetModel() or self:GetModel() != self:GetWorldModel() ) then
+		self:SetModel( self:GetWorldModel() )
+	end
 
 	local selectedForcePower = self:GetActiveForcePowerType( self:GetForceType() )
 	if ( selectedForcePower && selectedForcePower.think && !self.Owner:KeyDown( IN_USE ) ) then
@@ -983,7 +985,9 @@ end
 
 function SWEP:DrawWorldModelTranslucent()
 	self.WorldModel = self:GetWorldModel()
-	self:SetModel( self:GetWorldModel() )
+	if ( !self:GetModel() or self:GetModel() != self:GetWorldModel() ) then
+		self:SetModel( self:GetWorldModel() )
+	end
 
 	self:DrawModel()
 	if ( !IsValid( self:GetOwner() ) or halo.RenderedEntity() == self ) then return end

@@ -132,7 +132,9 @@ hook.Add( "PostPlayerDraw", "rb655_lightsaber", function( ply )
 	if ( !IsValid( ply.LightsaberMDL ) ) then return end -- We are still invalid, bail
 
 	ply.LightsaberMDL:SetNoDraw( true )
-	ply.LightsaberMDL:SetModel( wep.WorldModel )
+	if ( !ply.LightsaberMDL:GetModel() or ply.LightsaberMDL:GetModel() != wep.WorldModel ) then
+		ply.LightsaberMDL:SetModel( wep.WorldModel )
+	end
 
 	local pos, ang = ply:GetBonePosition( 0 )
 	ang:RotateAroundAxis( ang:Up(), 80 )
