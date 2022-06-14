@@ -252,7 +252,7 @@ rb655_AddForcePower( {
 		if ( self:GetForce() < 3 or CLIENT ) then return end
 
 		local foundents = 0
-		for id, ent in pairs( self:SelectTargets( 3 ) ) do
+		for id, ent in ipairs( self:SelectTargets( 3 ) ) do
 			if ( !IsValid( ent ) ) then continue end
 
 			foundents = foundents + 1
