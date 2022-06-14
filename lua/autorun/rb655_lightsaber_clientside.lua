@@ -155,8 +155,7 @@ hook.Add( "PostPlayerDraw", "rb655_lightsaber", function( ply )
 	pos = pos - ang:Right() * 8 - ang:Forward() * 8
 	if ( wep.WorldModel == "models/weapons/starwars/w_maul_saber_staff_hilt.mdl" ) then
 		pos = pos - ang:Forward() * 5
-	end
-	if ( wep.WorldModel == "models/weapons/starwars/w_kr_hilt.mdl" ) then
+	elseif ( wep.WorldModel == "models/weapons/starwars/w_kr_hilt.mdl" ) then
 		pos = pos + ang:Forward() * 5
 	end
 
