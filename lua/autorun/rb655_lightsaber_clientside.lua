@@ -316,7 +316,7 @@ end
 function rb655_ProcessLightsaberEntity( ent )
 	local bladesFound = false -- true if the model is OLD and does not have blade attachments
 	local blades = 0
-	for id, t in pairs( ent:GetAttachments() or {} ) do -- TODO: Remove the {} part
+	for id, t in ipairs( ent:GetAttachments() or {} ) do -- TODO: Remove the {} part
 		if ( !string.match( t.name, "blade(%d+)" ) && !string.match( t.name, "quillon(%d+)" ) ) then continue end
 
 		local bladeNum = string.match( t.name, "blade(%d+)" )
