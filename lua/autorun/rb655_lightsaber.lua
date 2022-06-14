@@ -205,7 +205,7 @@ rb655_AddForcePower( {
 	material = Material( "lightsaber_icons/healing.png" ),
 	description = "Hold Mouse 2 to slowly heal yourself",
 	action = function( self, ply )
-		if ( self:GetForce() < 1 --[[|| !ply:IsOnGround()]] or ply:Health() >= 100 or CLIENT ) then return end
+		if ( self:GetForce() < 1 --[[|| !ply:IsOnGround()]] or ply:Health() >= (ply:GetMaxHealth() or 100) or CLIENT ) then return end
 		self:SetForce( self:GetForce() - 1 )
 
 		self:SetNextAttack( 0.2 )
