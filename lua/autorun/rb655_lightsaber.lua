@@ -49,7 +49,7 @@ end
 function rb655_GetLightsaber( ply )
 	if ( !IsValid( ply ) ) then return end
 
-	for i, wep in pairs( ply:GetWeapons() ) do
+	for i, wep in ipairs( ply:GetWeapons() ) do
 		if ( wep.IsLightsaber ) then return wep end
 	end
 end
