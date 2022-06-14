@@ -96,12 +96,13 @@ function SWEP:SelectTargets( num )
 	} )]]
 
 	local p = {}
-	for id, ply in pairs( ents.GetAll() ) do
-		if ( !ply:GetModel() or ply:GetModel() == "" or ply == self.Owner or ply:Health() < 1 ) then continue end
-		if ( string.StartWith( ply:GetModel() or "", "models/gibs/" ) ) then continue end
-		if ( string.find( ply:GetModel() or "", "chunk" ) ) then continue end
-		if ( string.find( ply:GetModel() or "", "_shard" ) ) then continue end
-		if ( string.find( ply:GetModel() or "", "_splinters" ) ) then continue end
+	for id, ply in ipairs( ents.GetAll() ) do
+		local mdl = ply:GetModel()
+		if ( !mdl or mdl == "" or ply == self.Owner or ply:Health() < 1 ) then continue end
+		if ( string.StartWith( mdl or "", "models/gibs/" ) ) then continue end
+		if ( string.find( mdl or "", "chunk" ) ) then continue end
+		if ( string.find( mdl or "", "_shard" ) ) then continue end
+		if ( string.find( mdl or "", "_splinters" ) ) then continue end
 
 		local tr = util.TraceLine( {
 			start = self.Owner:GetShootPos(),
@@ -115,7 +116,7 @@ function SWEP:SelectTargets( num )
 		local pos2 = ply:GetPos()
 		local dot = self.Owner:GetAimVector():Dot( ( self.Owner:GetPos() - pos2 ):GetNormalized() )
 
-		if ( pos1:Distance( pos2 ) <= dist && ply:EntIndex() > 0 && ply:GetModel() && ply:GetModel() != "" ) then
+		if ( pos1:Distance( pos2 ) <= dist && ply:EntIndex() > 0 && mdl && mdl != "" ) then
 			table.insert( p, { ply = ply, dist = tr.HitPos:Distance( pos2 ), dot = dot, score = -dot + ( ( dist - pos1:Distance( pos2 ) ) / dist ) * 50 } )
 		end
 	end
@@ -132,7 +133,7 @@ end
 
 function SWEP:GetActiveForcePowers()
 	local ForcePowers = {}
-	for id, t in pairs( rb655_GetForcePowers() ) do
+	for id, t in ipairs( rb655_GetForcePowers() ) do
 		local ret = hook.Run( "CanUseLightsaberForcePower", self:GetOwner(), t.name )
 		if ( ret == false ) then continue end
 
