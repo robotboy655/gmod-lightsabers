@@ -146,7 +146,7 @@ rb655_AddForcePower( {
 
 		local maxdist = 128 * self._ForceRepulse
 
-		for _, e in pairs( ents.FindInSphere( self.Owner:GetPos(), maxdist ) ) do
+		for _, e in ipairs( ents.FindInSphere( self.Owner:GetPos(), maxdist ) ) do
 			if ( e == self.Owner ) then continue end
 
 			local dist = self.Owner:GetPos():Distance( e:GetPos() )
