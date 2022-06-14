@@ -1327,7 +1327,7 @@ local function DrawForceSelectionHUD( ForceSelectionEnabled, Force, MaxForce, Se
 	local y = y - icon - gap
 	local h = icon
 
-	for id, t in pairs( ForcePowers ) do
+	for id, t in ipairs( ForcePowers ) do
 		local x = x + ( id - 1 ) * ( h + gap )
 		local x2 = math.floor( x + icon / 2 )
 
