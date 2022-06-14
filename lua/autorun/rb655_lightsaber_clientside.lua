@@ -342,15 +342,15 @@ function rb655_ProcessLightsaberEntity( ent )
 		rb655_ProcessBlade( ent:EntIndex(), pos, ang, ent:GetBladeLength(), 1 )
 	end
 end
-
+local ents_FindByClass = ents.FindByClass
 hook.Add( "Think", "rb655_lightsaber_ugly_fixes", function()
-	for id, ent in ipairs( ents.FindByClass( "weapon_lightsaber*" ) ) do
+	for id, ent in ipairs( ents_FindByClass( "weapon_lightsaber*" ) ) do
 		if ( !IsValid( ent:GetOwner() ) or ent:GetOwner():GetActiveWeapon() != ent or !ent.GetBladeLength or ent:GetBladeLength() <= 0 ) then continue end
 
 		rb655_ProcessLightsaberEntity( ent )
 	end
 
-	for id, ent in ipairs( ents.FindByClass( "ent_lightsaber*" ) ) do
+	for id, ent in ipairs( ents_FindByClass( "ent_lightsaber*" ) ) do
 		if ( !ent.GetBladeLength or ent:GetBladeLength() <= 0 ) then continue end
 
 		rb655_ProcessLightsaberEntity( ent )
