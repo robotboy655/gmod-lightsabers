@@ -110,7 +110,7 @@ local convars = {
 hook.Add( "Initialize", "rb655_fix_convars", function()
 	if ( !GetConVar( "rb655_lightsaber_model" ) ) then return end
 
-	for id, cvar in pairs( convars ) do
+	for id, cvar in ipairs( convars ) do
 		if ( tr[ GetConVar( cvar ):GetString():lower() ] ) then
 			RunConsoleCommand( cvar, tr[ GetConVar( cvar ):GetString():lower() ] )
 			print( "Fixing convar value for " .. cvar .. "!" )
