@@ -57,14 +57,14 @@ local function GenerateLightingSegs( from, to, deviations, segs )
 		lastpos = a
 	end
 
-	for k, v in pairs( segments ) do
+	for k, v in ipairs( segments ) do
 		if ( k == 1 || k == #segments ) then continue end
 
 		segments[ k ][ 1 ] = segments[ k ][ 1 ] + right * math.random( -deviations, deviations ) + up * math.random( -deviations, deviations )
 		segments[ k - 1 ][ 2 ] = segments[ k ][ 1 ]
 	end
 
-	for k, v in pairs( segments ) do
+	for k, v in ipairs( segments ) do
 		if ( k == 1 || k == #segments ) then continue end
 
 		if ( math.random( 0, 100 ) > 75 ) then
@@ -104,10 +104,10 @@ hook.Add( "PostDrawTranslucentRenderables", "", function()
 		--n = CurTime() + .01
 	--end
 
-	for id, t in pairs( segments ) do
+	for id, t in ipairs( segments ) do
 		if ( t.time < CurTime() ) then table.remove( segments, id ) continue end
 		render.SetMaterial( t.mat )
-		for id2, seg in pairs( t.segs ) do
+		for id2, seg in ipairs( t.segs ) do
 			render.DrawBeam( seg[1], seg[2], ( math.max( t.startpos:Distance( t.endpos ) - seg[1]:Distance( t.endpos ), 20) / ( t.startpos:Distance( t.endpos ) ) * t.w ) * ( (t.time - CurTime() ) / tiem ), 0, seg[1]:Distance( seg[2] ) / 25, Color( 255, 255, 255 ) )
 			--render.DrawBeam( seg[1], seg[2], (id2 / #t.segs * t.w ) * ((t.time - CurTime()) / tiem), 0, seg[1]:Distance( seg[2] ) / 25, Color( 255, 255, 255 ) )
 		end

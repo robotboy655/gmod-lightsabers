@@ -49,7 +49,7 @@ end
 function rb655_GetLightsaber( ply )
 	if ( !IsValid( ply ) ) then return end
 
-	for i, wep in pairs( ply:GetWeapons() ) do
+	for i, wep in ipairs( ply:GetWeapons() ) do
 		if ( wep.IsLightsaber ) then return wep end
 	end
 end
@@ -146,7 +146,7 @@ rb655_AddForcePower( {
 
 		local maxdist = 128 * self._ForceRepulse
 
-		for _, e in pairs( ents.FindInSphere( self.Owner:GetPos(), maxdist ) ) do
+		for _, e in ipairs( ents.FindInSphere( self.Owner:GetPos(), maxdist ) ) do
 			if ( e == self.Owner ) then continue end
 
 			local dist = self.Owner:GetPos():Distance( e:GetPos() )
@@ -205,7 +205,7 @@ rb655_AddForcePower( {
 	material = Material( "lightsaber_icons/healing.png" ),
 	description = "Hold Mouse 2 to slowly heal yourself",
 	action = function( self, ply )
-		if ( self:GetForce() < 1 --[[|| !ply:IsOnGround()]] or ply:Health() >= 100 or CLIENT ) then return end
+		if ( self:GetForce() < 1 --[[|| !ply:IsOnGround()]] or ply:Health() >= (ply:GetMaxHealth() or 100) or CLIENT ) then return end
 		self:SetForce( self:GetForce() - 1 )
 
 		self:SetNextAttack( 0.2 )
@@ -252,7 +252,7 @@ rb655_AddForcePower( {
 		if ( self:GetForce() < 3 or CLIENT ) then return end
 
 		local foundents = 0
-		for id, ent in pairs( self:SelectTargets( 3 ) ) do
+		for id, ent in ipairs( self:SelectTargets( 3 ) ) do
 			if ( !IsValid( ent ) ) then continue end
 
 			foundents = foundents + 1

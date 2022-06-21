@@ -110,7 +110,7 @@ local convars = {
 hook.Add( "Initialize", "rb655_fix_convars", function()
 	if ( !GetConVar( "rb655_lightsaber_model" ) ) then return end
 
-	for id, cvar in pairs( convars ) do
+	for id, cvar in ipairs( convars ) do
 		if ( tr[ GetConVar( cvar ):GetString():lower() ] ) then
 			RunConsoleCommand( cvar, tr[ GetConVar( cvar ):GetString():lower() ] )
 			print( "Fixing convar value for " .. cvar .. "!" )
@@ -155,8 +155,7 @@ hook.Add( "PostPlayerDraw", "rb655_lightsaber", function( ply )
 	pos = pos - ang:Right() * 8 - ang:Forward() * 8
 	if ( wep.WorldModel == "models/weapons/starwars/w_maul_saber_staff_hilt.mdl" ) then
 		pos = pos - ang:Forward() * 5
-	end
-	if ( wep.WorldModel == "models/weapons/starwars/w_kr_hilt.mdl" ) then
+	elseif ( wep.WorldModel == "models/weapons/starwars/w_kr_hilt.mdl" ) then
 		pos = pos + ang:Forward() * 5
 	end
 
@@ -316,7 +315,7 @@ end
 function rb655_ProcessLightsaberEntity( ent )
 	local bladesFound = false -- true if the model is OLD and does not have blade attachments
 	local blades = 0
-	for id, t in pairs( ent:GetAttachments() or {} ) do -- TODO: Remove the {} part
+	for id, t in ipairs( ent:GetAttachments() or {} ) do -- TODO: Remove the {} part
 		if ( !string.match( t.name, "blade(%d+)" ) && !string.match( t.name, "quillon(%d+)" ) ) then continue end
 
 		local bladeNum = string.match( t.name, "blade(%d+)" )
@@ -342,15 +341,15 @@ function rb655_ProcessLightsaberEntity( ent )
 		rb655_ProcessBlade( ent:EntIndex(), pos, ang, ent:GetBladeLength(), 1 )
 	end
 end
-
+local ents_FindByClass = ents.FindByClass
 hook.Add( "Think", "rb655_lightsaber_ugly_fixes", function()
-	for id, ent in ipairs( ents.FindByClass( "weapon_lightsaber*" ) ) do
+	for id, ent in ipairs( ents_FindByClass( "weapon_lightsaber*" ) ) do
 		if ( !IsValid( ent:GetOwner() ) or ent:GetOwner():GetActiveWeapon() != ent or !ent.GetBladeLength or ent:GetBladeLength() <= 0 ) then continue end
 
 		rb655_ProcessLightsaberEntity( ent )
 	end
 
-	for id, ent in ipairs( ents.FindByClass( "ent_lightsaber*" ) ) do
+	for id, ent in ipairs( ents_FindByClass( "ent_lightsaber*" ) ) do
 		if ( !ent.GetBladeLength or ent:GetBladeLength() <= 0 ) then continue end
 
 		rb655_ProcessLightsaberEntity( ent )

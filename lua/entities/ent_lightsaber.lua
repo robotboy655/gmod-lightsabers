@@ -182,7 +182,7 @@ function ENT:Draw()
 
 	local bladesFound = false -- true if the model is OLD and does not have blade attachments
 	local blades = 0
-	for id, t in pairs( self:GetAttachments() or {} ) do
+	for id, t in ipairs( self:GetAttachments() or {} ) do
 		if ( !string.match( t.name, "blade(%d+)" ) && !string.match( t.name, "quillon(%d+)" ) ) then continue end
 
 		local bladeNum = string.match( t.name, "blade(%d+)" )
