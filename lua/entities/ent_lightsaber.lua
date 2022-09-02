@@ -73,7 +73,6 @@ function ENT:SetBladeLength( val )
 end
 
 function ENT:Initialize()
-
 	if ( SERVER ) then
 		self:PhysicsInit( SOLID_VPHYSICS )
 		self:SetMoveType( MOVETYPE_VPHYSICS )
@@ -341,7 +340,7 @@ end
 function ENT:Use( activator, caller, useType, value )
 	if ( !IsValid( activator ) or !activator:KeyPressed( IN_USE ) ) then return end
 	if ( self:WaterLevel() > 2 && !self:GetWorksUnderwater() ) then return end
-
+	
 	--[[if ( self:GetEnabled() ) then
 		self:EmitSound( self.OffSound )
 	else
@@ -353,7 +352,7 @@ end
 
 function ENT:SpawnFunction( ply, tr )
 	if ( !tr.Hit or !ply:CheckLimit( "ent_lightsabers" ) ) then return end
-
+	
 	local ent = ents.Create( ClassName )
 	ent:SetPos( tr.HitPos + tr.HitNormal * 2 )
 
@@ -373,26 +372,37 @@ function ENT:SpawnFunction( ply, tr )
 
 	local mdl = ply:GetInfo( "rb655_lightsaber_model" )
 	local humSnd = ply:GetInfo( "rb655_lightsaber_humsound" )
+	local onSnd = ply:GetInfo( "rb655_lightsaber_onsound" )
+	local offSnd = ply:GetInfo( "rb655_lightsaber_offsound" )
+	local swingSnd = ply:GetInfo( "rb655_lightsaber_swingsound" )
+
 	if ( GetConVarNumber( "rb655_lightsaber_disallow_custom_content" ) > 0 && !game.SinglePlayer() ) then
-		if ( list.HasEntry( "LightsaberModels", mdl ) ) then ent:SetModel( mdl ) else ent:SetModel( "models/sgg/starwars/weapons/w_anakin_ep2_saber_hilt.mdl" ) end
+		
+		if ( list.HasEntry( "LightsaberModels", mdl ) ) then ent:SetModel( mdl ) end
 
 		for k, v in pairs( list.Get( "rb655_LightsaberHumSounds" ) ) do
 			if ( v.rb655_lightsaber_humsound == humSnd ) then ent.LoopSound = humSnd end
 		end
 
-		-- TODO: The rest of it
+		for k, v in pairs( list.Get( "rb655_LightsaberIgniteSounds" ) ) do
+			if ( v.rb655_lightsaber_onsound == onSnd ) then ent.OnSound = onSnd end
+			if ( v.rb655_lightsaber_offsound == offSnd ) then ent.OffSound = offSnd end
+		end
+
+		for k, v in pairs( list.Get( "rb655_LightsaberSwingSounds" ) ) do
+			if ( v.rb655_lightsaber_swingsound == swingSnd ) then ent.SwingSound = swingSnd end
+		end
 	else
 		ent:SetModel( mdl )
 		ent.LoopSound = humSnd
+		ent.SwingSound = swingSnd
+		ent.OnSound = onSnd
+		ent.OffSound = offSnd
 	end
-
+	
 	-- Sync values from the tool
 	ent:SetCrystalColor( Vector( ply:GetInfo( "rb655_lightsaber_red" ), ply:GetInfo( "rb655_lightsaber_green" ), ply:GetInfo( "rb655_lightsaber_blue" ) ) / 255 )
 	ent:SetDarkInner( ply:GetInfo( "rb655_lightsaber_dark" ) == "1" )
-
-	ent.SwingSound = ply:GetInfo( "rb655_lightsaber_swingsound" )
-	ent.OnSound = ply:GetInfo( "rb655_lightsaber_onsound" )
-	ent.OffSound = ply:GetInfo( "rb655_lightsaber_offsound" )
 
 	ent:Spawn()
 	ent:Activate()
