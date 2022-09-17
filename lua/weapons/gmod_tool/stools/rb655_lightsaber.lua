@@ -132,14 +132,23 @@ function TOOL:LeftClick( trace )
 
 		-- This is quite hefty
 		local humSnds = list.Get( "rb655_LightsaberHumSounds" )
-		local foundHum = false
+		local foundHum, foundOnSnd, foundOffSnd, foundSwingSound = false, false, false, false
 		for k, v in pairs( humSnds ) do
 			if ( v.rb655_lightsaber_humsound == hs ) then
 				foundHum = true
 			end
 		end
 
-		if ( !foundHum ) then
+		for k, v in pairs( list.Get( "rb655_LightsaberIgniteSounds" ) ) do
+			if ( v.rb655_lightsaber_onsound == ons ) then foundOnSnd = true end
+			if ( v.rb655_lightsaber_offsound == offs ) then foundOffSnd = true end
+		end
+
+		for k, v in pairs( list.Get( "rb655_LightsaberSwingSounds" ) ) do
+			if ( v.rb655_lightsaber_swingsound == ss ) then foundSwingSound = true end
+		end
+
+		if ( !foundHum or !foundOnSnd or !foundOffSnd or !foundSwingSound) then
 			ply:SendLua( "rb655_InvalidSettings()" )
 			return
 		end

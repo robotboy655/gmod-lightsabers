@@ -276,6 +276,9 @@ function SWEP:LoadToolValues( ply )
 	-- This really needs to be better
 	local mdl = ply:GetInfo( "rb655_lightsaber_model" )
 	local humSnd = ply:GetInfo( "rb655_lightsaber_humsound" )
+	local onSnd = ply:GetInfo( "rb655_lightsaber_onsound" )
+	local offSnd = ply:GetInfo( "rb655_lightsaber_offsound" )
+	local swingSnd = ply:GetInfo( "rb655_lightsaber_swingsound" )
 	if ( GetConVarNumber( "rb655_lightsaber_disallow_custom_content" ) > 0 && !game.SinglePlayer() ) then
 		if ( list.HasEntry( "LightsaberModels", mdl ) ) then self:SetWorldModel( mdl ) end
 
@@ -283,10 +286,21 @@ function SWEP:LoadToolValues( ply )
 			if ( v.rb655_lightsaber_humsound == humSnd ) then self.LoopSound = humSnd end
 		end
 
+		for k, v in pairs( list.Get( "rb655_LightsaberIgniteSounds" ) ) do
+			if ( v.rb655_lightsaber_onsound == onSnd ) then self:SetOnSound(onSnd) end
+			if ( v.rb655_lightsaber_offsound == offSnd ) then self:SetOnSound(offSnd) end
+		end
+
+		for k, v in pairs( list.Get( "rb655_LightsaberSwingSounds" ) ) do
+			if ( v.rb655_lightsaber_swingsound == swingSnd ) then self.SwingSound = swingSnd end
+		end
 		-- TODO: The rest of it
 	else
 		self:SetWorldModel( mdl )
 		self.LoopSound = humSnd
+		self.SwingSound = swingSnd
+		self:SetOnSound( onSnd )
+		self:SetOffSound( offSnd )
 	end
 
 	self:SetMaxLength( maxLen )
@@ -297,9 +311,7 @@ function SWEP:LoadToolValues( ply )
 	self.WorldModel = self:GetWorldModel()
 	--self:PhysicsInit( SOLID_VPHYSICS )
 
-	self.SwingSound = ply:GetInfo( "rb655_lightsaber_swingsound" )
-	self:SetOnSound( ply:GetInfo( "rb655_lightsaber_onsound" ) )
-	self:SetOffSound( ply:GetInfo( "rb655_lightsaber_offsound" ) )
+
 	--self:SetEnabled( ply:GetInfo( "rb655_lightsaber_starton" ) )
 
 	self.WeaponSynched = true
