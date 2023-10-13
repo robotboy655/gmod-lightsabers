@@ -4,8 +4,9 @@
 	"tags"		:	[ "fun", "comic" ],
 	"ignore"	:
 	[
-		".git*",
+		"preview.png",
 		"*.bat",
+		"*.code-workspace",
 		"*.md"
 	]
 }
