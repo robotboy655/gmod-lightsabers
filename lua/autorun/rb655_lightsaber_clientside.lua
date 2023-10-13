@@ -341,15 +341,38 @@ function rb655_ProcessLightsaberEntity( ent )
 		rb655_ProcessBlade( ent:EntIndex(), pos, ang, ent:GetBladeLength(), 1 )
 	end
 end
+
+-- Try to be faster.. This is kinda ugly
 local ents_FindByClass = ents.FindByClass
+local inext = ipairs( {} )
+local LightsaberWCache = nil
+local LightsaberECache = nil
+
+local function rb655_lightsaberW_iterator()
+	if ( LightsaberWCache == nil ) then LightsaberWCache = ents_FindByClass( "weapon_lightsaber*" ) end
+	return inext, LightsaberWCache, 0
+end
+local function rb655_lightsaberE_iterator()
+	if ( LightsaberECache == nil ) then LightsaberECache = ents_FindByClass( "ent_lightsaber*" ) end
+	return inext, LightsaberECache, 0
+end
+local function InvalidateLightsaberCache( ent )
+	LightsaberWCache = nil
+	LightsaberECache = nil
+end
+hook.Add( "OnEntityCreated", "rb655_lightsaber_iterator", InvalidateLightsaberCache )
+hook.Add( "EntityRemoved", "rb655_lightsaber_iterator", InvalidateLightsaberCache )
+
+
+
 hook.Add( "Think", "rb655_lightsaber_ugly_fixes", function()
-	for id, ent in ipairs( ents_FindByClass( "weapon_lightsaber*" ) ) do
+	for id, ent in rb655_lightsaberW_iterator() do
 		if ( !IsValid( ent:GetOwner() ) or ent:GetOwner():GetActiveWeapon() != ent or !ent.GetBladeLength or ent:GetBladeLength() <= 0 ) then continue end
 
 		rb655_ProcessLightsaberEntity( ent )
 	end
 
-	for id, ent in ipairs( ents_FindByClass( "ent_lightsaber*" ) ) do
+	for id, ent in rb655_lightsaberE_iterator() do
 		if ( !ent.GetBladeLength or ent:GetBladeLength() <= 0 ) then continue end
 
 		rb655_ProcessLightsaberEntity( ent )
