@@ -269,9 +269,10 @@ function ENT:Think()
 	end
 
 	--[[if ( self.SoundSwing ) then
+		local owner = self:GetOwner()
 		--local ang = self:GetAngles()
-		local dist1 = pos:Distance( self.Owner:GetShootPos() )
-		local dist2 = (pos+ ang * self:GetBladeLength()):Distance( self.Owner:GetShootPos() )
+		local dist1 = pos:Distance( owner:GetShootPos() )
+		local dist2 = (pos+ ang * self:GetBladeLength()):Distance( owner:GetShootPos() )
 		local val = (dist1 - dist2) / self:GetBladeLength()
 		print(val,CurTime())
 		--if ( self.LastAng != ang ) then
@@ -340,7 +341,7 @@ end
 function ENT:Use( activator, caller, useType, value )
 	if ( !IsValid( activator ) or !activator:KeyPressed( IN_USE ) ) then return end
 	if ( self:WaterLevel() > 2 && !self:GetWorksUnderwater() ) then return end
-	
+
 	--[[if ( self:GetEnabled() ) then
 		self:EmitSound( self.OffSound )
 	else
@@ -352,7 +353,7 @@ end
 
 function ENT:SpawnFunction( ply, tr )
 	if ( !tr.Hit or !ply:CheckLimit( "ent_lightsabers" ) ) then return end
-	
+
 	local ent = ents.Create( ClassName )
 	ent:SetPos( tr.HitPos + tr.HitNormal * 2 )
 
@@ -377,7 +378,7 @@ function ENT:SpawnFunction( ply, tr )
 	local swingSnd = ply:GetInfo( "rb655_lightsaber_swingsound" )
 
 	if ( GetConVarNumber( "rb655_lightsaber_disallow_custom_content" ) > 0 && !game.SinglePlayer() ) then
-		
+
 		if ( list.HasEntry( "LightsaberModels", mdl ) ) then ent:SetModel( mdl ) end
 
 		for k, v in pairs( list.Get( "rb655_LightsaberHumSounds" ) ) do
@@ -399,7 +400,7 @@ function ENT:SpawnFunction( ply, tr )
 		ent.OnSound = onSnd
 		ent.OffSound = offSnd
 	end
-	
+
 	-- Sync values from the tool
 	ent:SetCrystalColor( Vector( ply:GetInfo( "rb655_lightsaber_red" ), ply:GetInfo( "rb655_lightsaber_green" ), ply:GetInfo( "rb655_lightsaber_blue" ) ) / 255 )
 	ent:SetDarkInner( ply:GetInfo( "rb655_lightsaber_dark" ) == "1" )

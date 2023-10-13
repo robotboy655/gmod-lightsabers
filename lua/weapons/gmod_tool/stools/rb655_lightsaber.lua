@@ -45,7 +45,7 @@ if ( SERVER ) then
 	CreateConVar( "sbox_maxent_lightsabers", 2 )
 
 	function MakeLightsaber( ply, model, pos, ang, LoopSound, SwingSound, OnSound, OffSound )
-		if ( IsValid( ply ) && !ply:CheckLimit( "ent_lightsabers" ) ) then return false end
+		if ( IsValid( ply ) and !ply:CheckLimit( "ent_lightsabers" ) ) then return false end
 
 		local ent_lightsaber = ents.Create( "ent_lightsaber" )
 		if ( !IsValid( ent_lightsaber ) ) then return false end
@@ -91,9 +91,9 @@ function rb655_InvalidSettings()
 end
 
 function TOOL:LeftClick( trace )
-	if ( trace.HitSky || !trace.HitPos ) then return false end
-	if ( IsValid( trace.Entity ) && ( trace.Entity:GetClass() == "ent_lightsaber" || trace.Entity:IsPlayer() ) ) then return false end
-	--if ( trace.Entity:IsNPC() && trace.Entity:GetClass() != "npc_metropolice" ) then return false end
+	if ( trace.HitSky or !trace.HitPos ) then return false end
+	if ( IsValid( trace.Entity ) and ( trace.Entity:GetClass() == "ent_lightsaber" or trace.Entity:IsPlayer() ) ) then return false end
+	--if ( trace.Entity:IsNPC() and trace.Entity:GetClass() != "npc_metropolice" ) then return false end
 	if ( CLIENT ) then return true end
 
 	local ply = self:GetOwner()
@@ -124,7 +124,7 @@ function TOOL:LeftClick( trace )
 		bld_w = math.Clamp( bld_w, 2, 4 )
 	end
 
-	if ( GetConVarNumber( "rb655_lightsaber_disallow_custom_content" ) > 0 && !game.SinglePlayer() ) then
+	if ( GetConVarNumber( "rb655_lightsaber_disallow_custom_content" ) > 0 and !game.SinglePlayer() ) then
 		if ( !list.HasEntry( "LightsaberModels", mdl ) ) then
 			ply:SendLua( "rb655_InvalidSettings()" )
 			return
@@ -156,7 +156,7 @@ function TOOL:LeftClick( trace )
 
 	local ent_lightsaber
 	if ( trace.Entity:IsNPC() ) then
-		if ( !IsValid( trace.Entity:GetActiveWeapon() ) || trace.Entity:GetActiveWeapon():GetClass() != "weapon_lightsaber" ) then
+		if ( !IsValid( trace.Entity:GetActiveWeapon() ) or trace.Entity:GetActiveWeapon():GetClass() != "weapon_lightsaber" ) then
 			ent_lightsaber = trace.Entity:Give( "weapon_lightsaber" )
 		else
 			ent_lightsaber = trace.Entity:GetActiveWeapon()
@@ -192,7 +192,7 @@ function TOOL:LeftClick( trace )
 	local phys = ent_lightsaber:GetPhysicsObject()
 	if ( IsValid( phys ) ) then phys:Wake() end
 
-	--[[if ( trace.Entity:IsNPC() && trace.Entity:GetClass() == "npc_metropolice" ) then
+	--[[if ( trace.Entity:IsNPC() and trace.Entity:GetClass() == "npc_metropolice" ) then
 		ent_lightsaber:SetParent( trace.Entity )
 		ent_lightsaber:Fire( "SetParentAttachment", "RHand" )
 
@@ -211,8 +211,8 @@ function TOOL:LeftClick( trace )
 end
 
 function TOOL:RightClick( trace )
-	if ( trace.HitSky || !trace.HitPos ) then return false end
-	if ( IsValid( trace.Entity ) && ( trace.Entity:GetClass() == "ent_lightsaber" ) ) then return false end
+	if ( trace.HitSky or !trace.HitPos ) then return false end
+	if ( IsValid( trace.Entity ) and ( trace.Entity:GetClass() == "ent_lightsaber" ) ) then return false end
 	if ( CLIENT ) then return true end
 
 	local ply = self:GetOwner()
@@ -224,7 +224,7 @@ function TOOL:RightClick( trace )
 	w:LoadToolValues( ply )
 
 	timer.Simple( 0.2, function()
-		if ( !IsValid( w ) || !IsValid( ply ) ) then return end
+		if ( !IsValid( w ) or !IsValid( ply ) ) then return end
 
 		w:SetEnabled( tobool( ply:GetInfo( "rb655_lightsaber_starton" ) ) )
 		ply:SelectWeapon( "weapon_lightsaber" )
@@ -239,7 +239,7 @@ function TOOL:UpdateGhostEntity( ent, ply )
 	local trace = ply:GetEyeTrace()
 
 	if ( !trace.Hit ) then ent:SetNoDraw( true ) return end
-	if ( IsValid( trace.Entity ) && trace.Entity:GetClass() == "ent_lightsaber" || trace.Entity:IsPlayer() || trace.Entity:IsNPC() ) then ent:SetNoDraw( true ) return end
+	if ( IsValid( trace.Entity ) and trace.Entity:GetClass() == "ent_lightsaber" or trace.Entity:IsPlayer() or trace.Entity:IsNPC() ) then ent:SetNoDraw( true ) return end
 
 	local ang = trace.HitNormal:Angle()
 	ang.p = ang.p - 90
@@ -254,7 +254,7 @@ function TOOL:UpdateGhostEntity( ent, ply )
 end
 
 function TOOL:Think()
-	if ( !IsValid( self.GhostEntity ) || self.GhostEntity:GetModel() != self:GetClientInfo( "model" ) ) then
+	if ( !IsValid( self.GhostEntity ) or self.GhostEntity:GetModel() != self:GetClientInfo( "model" ) ) then
 		self:MakeGhostEntity( self:GetClientInfo( "model" ), Vector( 0, 0, 0 ), Angle( 0, 0, 0 ) )
 	end
 

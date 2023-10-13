@@ -81,40 +81,42 @@ function SWEP:PlayWeaponSound( snd, vol )
 
 	if ( snd == self:GetOnSound() or snd == self:GetOffSound() ) then vol = 0.4 end
 
-	if ( !IsValid( self.Owner ) ) then return self:EmitSound( snd, nil, nil, vol ) end
-	self.Owner:EmitSound( snd, nil, nil, vol )
+	local owner = self:GetOwner()
+	if ( !IsValid( owner ) ) then return self:EmitSound( snd, nil, nil, vol ) end
+	owner:EmitSound( snd, nil, nil, vol )
 end
 
 function SWEP:SelectTargets( num )
 	local t = {}
 	local dist = 512
+	local owner = self:GetOwner()
 
 	--[[local tr = util.TraceLine( {
-		start = self.Owner:GetShootPos(),
-		endpos = self.Owner:GetShootPos() + self.Owner:GetAimVector() * dist,
-		filter = self.Owner
+		start = owner:GetShootPos(),
+		endpos = owner:GetShootPos() + owner:GetAimVector() * dist,
+		filter = owner
 	} )]]
 
 	local p = {}
 	for id, ply in ipairs( ents.GetAll() ) do
 		local mdl = ply:GetModel()
-		if ( !mdl or mdl == "" or ply == self.Owner or ply:Health() < 1 ) then continue end
+		if ( !mdl or mdl == "" or ply == owner or ply:Health() < 1 ) then continue end
 		if ( string.StartWith( mdl or "", "models/gibs/" ) ) then continue end
 		if ( string.find( mdl or "", "chunk" ) ) then continue end
 		if ( string.find( mdl or "", "_shard" ) ) then continue end
 		if ( string.find( mdl or "", "_splinters" ) ) then continue end
 
 		local tr = util.TraceLine( {
-			start = self.Owner:GetShootPos(),
+			start = owner:GetShootPos(),
 			endpos = ply.GetShootPos && ply:GetShootPos() or ply:GetPos(),
-			filter = self.Owner,
+			filter = owner,
 		} )
 
 		if ( tr.Entity != ply && IsValid( tr.Entity ) or tr.Entity == game.GetWorld() ) then continue end
 
-		local pos1 = self.Owner:GetPos() + self.Owner:GetAimVector() * dist
+		local pos1 = owner:GetPos() + owner:GetAimVector() * dist
 		local pos2 = ply:GetPos()
-		local dot = self.Owner:GetAimVector():Dot( ( self.Owner:GetPos() - pos2 ):GetNormalized() )
+		local dot = owner:GetAimVector():Dot( ( owner:GetPos() - pos2 ):GetNormalized() )
 
 		if ( pos1:Distance( pos2 ) <= dist && ply:EntIndex() > 0 && mdl && mdl != "" ) then
 			table.insert( p, { ply = ply, dist = tr.HitPos:Distance( pos2 ), dot = dot, score = -dot + ( ( dist - pos1:Distance( pos2 ) ) / dist ) * 50 } )
@@ -187,7 +189,7 @@ hook.Add( "GetFallDamage", "rb655_lightsaber_no_fall_damage", function( ply, spe
 end )
 
 function SWEP:OnRestore()
-	self.Owner:SetNWFloat( "SWL_FeatherFall", 0 )
+	self:GetOwner():SetNWFloat( "SWL_FeatherFall", 0 )
 end
 
 hook.Add( "CreateMove", "rb655_lightsaber_no_fall_damage", function( cmd )
@@ -204,12 +206,13 @@ function SWEP:SetNextAttack( delay )
 end
 
 function SWEP:ForceJumpAnim()
-	self.Owner.m_bJumping = true
+	local owner = self:GetOwner()
+	owner.m_bJumping = true
 
-	self.Owner.m_bFirstJumpFrame = true
-	self.Owner.m_flJumpStartTime = CurTime()
+	owner.m_bFirstJumpFrame = true
+	owner.m_flJumpStartTime = CurTime()
 
-	self.Owner:AnimRestartMainSequence()
+	owner:AnimRestartMainSequence()
 end
 
 -- --------------------------------------------------------- Initialize --------------------------------------------------------- --
@@ -310,14 +313,13 @@ function SWEP:LoadToolValues( ply )
 	self:SetModel( self:GetWorldModel() )
 	self.WorldModel = self:GetWorldModel()
 	--self:PhysicsInit( SOLID_VPHYSICS )
-
-
 	--self:SetEnabled( ply:GetInfo( "rb655_lightsaber_starton" ) )
 
 	self.WeaponSynched = true
 
 	-- Start it if we spawned it using the spawnmenu!
-	if ( !IsValid( self.Owner ) or self.Owner:IsPlayer() ) then
+	local owner = self:GetOwner()
+	if ( !IsValid( owner ) or owner:IsPlayer() ) then
 		-- Gotta wait a tick so we don't play double sounds!
 		timer.Simple( 0, function() if ( !IsValid( self ) ) then return end self:SetEnabled( true ) end )
 	end
@@ -340,23 +342,24 @@ function SWEP:Initialize()
 
 	self:SetWeaponHoldType( self:GetTargetHoldType() )
 
-	if ( self.Owner && self.Owner:IsNPC() && SERVER ) then -- NPC Weapons
-		--self.Owner:Fire( "GagEnable" )
+	local owner = self:GetOwner()
+	if ( owner && owner:IsNPC() && SERVER ) then -- NPC Weapons
+		--owner:Fire( "GagEnable" )
 
-		if ( self.Owner:GetClass() == "npc_citizen" ) then
-			self.Owner:Fire( "DisableWeaponPickup" )
+		if ( owner:GetClass() == "npc_citizen" ) then
+			owner:Fire( "DisableWeaponPickup" )
 		end
 
-		self.Owner:SetKeyValue( "spawnflags", "256" )
+		owner:SetKeyValue( "spawnflags", "256" )
 
 		hook.Add( "Think", self, self.NPCThink )
 
 		timer.Simple( 0.5, function()
-			if ( !IsValid( self ) or !IsValid( self.Owner ) ) then return end
-			self.Owner:SetCurrentWeaponProficiency( 4 )
-			self.Owner:CapabilitiesAdd( CAP_FRIENDLY_DMG_IMMUNE )
-			self.Owner:CapabilitiesRemove( CAP_WEAPON_MELEE_ATTACK1 )
-			self.Owner:CapabilitiesRemove( CAP_INNATE_MELEE_ATTACK1 )
+			if ( !IsValid( self ) or !IsValid( owner ) ) then return end
+			owner:SetCurrentWeaponProficiency( 4 )
+			owner:CapabilitiesAdd( CAP_FRIENDLY_DMG_IMMUNE )
+			owner:CapabilitiesRemove( CAP_WEAPON_MELEE_ATTACK1 )
+			owner:CapabilitiesRemove( CAP_INNATE_MELEE_ATTACK1 )
 		end )
 	end
 end
@@ -364,7 +367,8 @@ end
 -- --------------------------------------------------------- NPC Weapons --------------------------------------------------------- --
 
 function SWEP:SetupWeaponHoldTypeForAI( t )
-	if ( !self.Owner:IsNPC() ) then return end
+	local owner = self:GetOwner()
+	if ( !owner:IsNPC() ) then return end
 
 	self.ActivityTranslateAI = {}
 
@@ -401,7 +405,7 @@ function SWEP:SetupWeaponHoldTypeForAI( t )
 	self.ActivityTranslateAI[ ACT_SMALL_FLINCH ]			= ACT_RANGE_ATTACK_PISTOL
 	self.ActivityTranslateAI[ ACT_BIG_FLINCH ]				= ACT_RANGE_ATTACK_PISTOL
 
-	if ( self.Owner:GetClass() == "npc_metropolice" ) then
+	if ( owner:GetClass() == "npc_metropolice" ) then
 
 	self.ActivityTranslateAI[ ACT_IDLE ]					= ACT_IDLE
 	self.ActivityTranslateAI[ ACT_IDLE_ANGRY ]				= ACT_IDLE_ANGRY_MELEE
@@ -419,7 +423,7 @@ function SWEP:SetupWeaponHoldTypeForAI( t )
 
 	return end
 
-	if ( self.Owner:GetClass() == "npc_combine_s2" ) then
+	if ( owner:GetClass() == "npc_combine_s2" ) then
 
 	self.ActivityTranslateAI[ ACT_IDLE ]					= ACT_IDLE
 	self.ActivityTranslateAI[ ACT_IDLE_ANGRY ]				= ACT_IDLE_ANGRY_MELEE
@@ -455,7 +459,7 @@ function SWEP:SetupWeaponHoldTypeForAI( t )
 
 	return end
 
-	if ( self.Owner:GetClass() == "npc_combine_s" ) then
+	if ( owner:GetClass() == "npc_combine_s" ) then
 
 	self.ActivityTranslateAI[ ACT_IDLE ]					= ACT_IDLE_UNARMED
 	self.ActivityTranslateAI[ ACT_IDLE_ANGRY ]				= ACT_IDLE_SHOTGUN
@@ -494,8 +498,9 @@ function SWEP:GetCapabilities()
 end
 
 function SWEP:NPC_NextLogic()
-	if ( !IsValid( self ) or !IsValid( self.Owner ) ) then return end
-	if ( self.Owner:IsCurrentSchedule( SCHED_CHASE_ENEMY ) ) then return end
+	local owner = self:GetOwner()
+	if ( !IsValid( self ) or !IsValid( owner ) ) then return end
+	if ( owner:IsCurrentSchedule( SCHED_CHASE_ENEMY ) ) then return end
 	self.NPC_NextLogicTimer = true
 	self:NPC_ChaseEnemy()
 
@@ -505,33 +510,35 @@ function SWEP:NPC_NextLogic()
 end
 
 function SWEP:NPC_ChaseEnemy()
-	if ( !IsValid( self ) or !IsValid( self.Owner ) ) then return end
-	if ( self.Owner:GetEnemy():GetPos():Distance( self:GetPos() ) > 70 ) then
-		self.Owner:SetSchedule( SCHED_CHASE_ENEMY )
+	local owner = self:GetOwner()
+	if ( !IsValid( self ) or !IsValid( owner ) ) then return end
+	if ( owner:GetEnemy():GetPos():Distance( self:GetPos() ) > 70 ) then
+		owner:SetSchedule( SCHED_CHASE_ENEMY )
 	end
 
-	if ( self.Owner:GetEnemy() == self.Owner ) then self.Owner:SetEnemy( NULL ) return end
-	if ( !self.CooldownTimer && self.Owner:GetEnemy():GetPos():Distance( self:GetPos() ) <= 70 ) then
-		self.Owner:SetSchedule( SCHED_MELEE_ATTACK1 )
+	if ( owner:GetEnemy() == owner ) then owner:SetEnemy( NULL ) return end
+	if ( !self.CooldownTimer && owner:GetEnemy():GetPos():Distance( self:GetPos() ) <= 70 ) then
+		owner:SetSchedule( SCHED_MELEE_ATTACK1 )
 		self:NPCShoot_Primary()
 	end
 end
 
 function SWEP:NPCThink()
-	if ( !IsValid( self.Owner ) or !IsValid( self ) or !self.Owner:IsNPC() ) then return end
+	local owner = self:GetOwner()
+	if ( !IsValid( owner ) or !IsValid( self ) or !owner:IsNPC() ) then return end
 
-	if ( self:GetEnabled() != IsValid( self.Owner:GetEnemy() ) ) then self:SetEnabled( IsValid( self.Owner:GetEnemy() ) ) end
+	if ( self:GetEnabled() != IsValid( owner:GetEnemy() ) ) then self:SetEnabled( IsValid( owner:GetEnemy() ) ) end
 
-	--self.Owner:RemoveAllDecals()
-	self.Owner:ClearCondition( 13 )
-	self.Owner:ClearCondition( 17 )
-	self.Owner:ClearCondition( 18 )
-	self.Owner:ClearCondition( 20 )
-	self.Owner:ClearCondition( 48 )
-	self.Owner:ClearCondition( 42 )
-	self.Owner:ClearCondition( 45 )
+	--owner:RemoveAllDecals()
+	owner:ClearCondition( 13 )
+	owner:ClearCondition( 17 )
+	owner:ClearCondition( 18 )
+	owner:ClearCondition( 20 )
+	owner:ClearCondition( 48 )
+	owner:ClearCondition( 42 )
+	owner:ClearCondition( 45 )
 
-	if ( !self.NPC_NextLogicTimer && IsValid( self.Owner:GetEnemy() ) ) then
+	if ( !self.NPC_NextLogicTimer && IsValid( owner:GetEnemy() ) ) then
 		self:NPC_NextLogic()
 	end
 
@@ -539,18 +546,19 @@ function SWEP:NPCThink()
 end
 
 function SWEP:NPCShoot_Primary()
-	if ( !IsValid( self ) or !IsValid( self.Owner ) ) then return end
-	if ( !self.Owner:GetEnemy() ) then return end
+	local owner = self:GetOwner()
+	if ( !IsValid( self ) or !IsValid( owner ) ) then return end
+	if ( !owner:GetEnemy() ) then return end
 
 	self.CooldownTimer = true
 	local seqtimer = 0.4
-	if self.Owner:GetClass() == "npc_alyx" then
+	if ( owner:GetClass() == "npc_alyx" ) then
 		seqtimer = 0.8
 	end
 
 	timer.Simple( seqtimer, function()
-		if ( !IsValid( self ) or !IsValid( self.Owner ) ) then return end
-		--[[if ( self.Owner:IsCurrentSchedule( SCHED_MELEE_ATTACK1 ) ) then
+		if ( !IsValid( self ) or !IsValid( owner ) ) then return end
+		--[[if ( owner:IsCurrentSchedule( SCHED_MELEE_ATTACK1 ) ) then
 			self:PrimaryAttack()
 		end]]
 		self.CooldownTimer = false
@@ -561,35 +569,38 @@ end
 
 -- TODO: HOOK THIS
 function SWEP:PrimaryAttack()
-	if ( !IsValid( self.Owner ) ) then return end
+	local owner = self:GetOwner()
+	if ( !IsValid( owner ) ) then return end
 
 	self:SetNextAttack( 0.5 )
 
-	if ( !self.Owner:IsNPC() && self:GetEnabled() ) then
-		self.Owner:AnimResetGestureSlot( GESTURE_SLOT_CUSTOM )
-		self.Owner:SetAnimation( PLAYER_ATTACK1 )
+	if ( !owner:IsNPC() && self:GetEnabled() ) then
+		owner:AnimResetGestureSlot( GESTURE_SLOT_CUSTOM )
+		owner:SetAnimation( PLAYER_ATTACK1 )
 	end
 end
 
 function SWEP:SecondaryAttack()
-	if ( !IsValid( self.Owner ) or !self:GetActiveForcePowerType( self:GetForceType() ) ) then return end
+	local owner = self:GetOwner()
+	if ( !IsValid( owner ) or !self:GetActiveForcePowerType( self:GetForceType() ) ) then return end
 	if ( game.SinglePlayer() && SERVER ) then self:CallOnClient( "SecondaryAttack", "" ) end
 
 	local selectedForcePower = self:GetActiveForcePowerType( self:GetForceType() )
 	if ( !selectedForcePower ) then return end
 
-	local ret = hook.Run( "CanUseLightsaberForcePower", self.Owner, selectedForcePower.name )
+	local ret = hook.Run( "CanUseLightsaberForcePower", owner, selectedForcePower.name )
 	if ( ret == false ) then return end
 
 	if ( selectedForcePower.action ) then
-		selectedForcePower.action( self, self.Owner )
+		selectedForcePower.action( self, owner )
 		if ( GetConVarNumber( "rb655_lightsaber_infinite" ) != 0 ) then self:SetForce( self:GetMaxForce() ) end
 	end
 end
 
 function SWEP:Reload()
-	if ( !self.Owner:KeyPressed( IN_RELOAD ) ) then return end
-	if ( IsPlayerUnderWater( self.Owner ) && !self:GetWorksUnderwater() && !self:GetEnabled() ) then return end
+	local owner = self:GetOwner()
+	if ( !IsValid( owner ) or !owner:KeyPressed( IN_RELOAD ) ) then return end
+	if ( IsPlayerUnderWater( owner ) && !self:GetWorksUnderwater() && !self:GetEnabled() ) then return end
 
 	self:SetEnabled( !self:GetEnabled() )
 end
@@ -607,7 +618,8 @@ end
 -- --------------------------------------------------------- Drop / Deploy / Holster / Enable / Disable --------------------------------------------------------- --
 
 function SWEP:OnEnabled( bDeploy )
-	if ( ( !self:GetEnabled() or bDeploy ) && IsValid( self.Owner ) ) then self:PlayWeaponSound( self:GetOnSound() ) end
+	local owner = self:GetOwner()
+	if ( ( !self:GetEnabled() or bDeploy ) && IsValid( owner ) ) then self:PlayWeaponSound( self:GetOnSound() ) end
 
 	if ( CLIENT or ( self:GetEnabled() && !bDeploy ) ) then return end
 
@@ -615,15 +627,15 @@ function SWEP:OnEnabled( bDeploy )
 	timer.Remove( "rb655_ls_ht" .. self:EntIndex() )
 
 	-- Don't (re)create the sounds if we don't have an owner or we already have the sounds
-	if ( !IsValid( self.Owner ) or self.SoundLoop ) then return end
+	if ( !IsValid( owner ) or self.SoundLoop ) then return end
 
-	self.SoundLoop = CreateSound( self.Owner, Sound( self.LoopSound ) )
+	self.SoundLoop = CreateSound( owner, Sound( self.LoopSound ) )
 	if ( self.SoundLoop ) then self.SoundLoop:Play() self.SoundLoop:ChangeVolume( 0, 0 ) end
 
-	self.SoundSwing = CreateSound( self.Owner, Sound( self.SwingSound ) )
+	self.SoundSwing = CreateSound( owner, Sound( self.SwingSound ) )
 	if ( self.SoundSwing ) then self.SoundSwing:Play() self.SoundSwing:ChangeVolume( 0, 0 ) end
 
-	self.SoundHit = CreateSound( self.Owner, Sound( self.HitSound or "lightsaber/saber_hit.wav" ) )
+	self.SoundHit = CreateSound( owner, Sound( self.HitSound or "lightsaber/saber_hit.wav" ) )
 	if ( self.SoundHit ) then self.SoundHit:Play() self.SoundHit:ChangeVolume( 0, 0 ) end
 end
 
@@ -661,13 +673,13 @@ function SWEP:OnDrop()
 end
 
 function SWEP:OnRemove()
-	if ( self:GetEnabled() && IsValid( self.Owner ) ) then self:PlayWeaponSound( self:GetOffSound() ) end
+	if ( self:GetEnabled() && IsValid( self:GetOwner() ) ) then self:PlayWeaponSound( self:GetOffSound() ) end
 	self:OnDisabled( true )
 end
 
 function SWEP:Deploy()
 
-	local ply = self.Owner
+	local ply = self:GetOwner()
 
 	if ( ply:IsPlayer() && !ply:IsBot() && !self.WeaponSynched && SERVER && GAMEMODE.IsSandboxDerived ) then
 		self:LoadToolValues( ply )
@@ -704,8 +716,9 @@ function SWEP:GetSaberPosAng( num, side )
 
 	if ( SERVER ) then self:SetIncorrectPlayerModel( 0 ) end
 
-	if ( IsValid( self.Owner ) ) then
-		local bone = self.Owner:LookupBone( "ValveBiped.Bip01_R_Hand" )
+	local owner = self:GetOwner()
+	if ( IsValid( owner ) ) then
+		local bone = owner:LookupBone( "ValveBiped.Bip01_R_Hand" )
 		local attachment = self:LookupAttachment( "blade" .. num )
 		if ( side ) then
 			attachment = self:LookupAttachment( "quillon" .. num )
@@ -720,7 +733,7 @@ function SWEP:GetSaberPosAng( num, side )
 
 			if ( !bone && SERVER ) then
 				PosAng.Pos = PosAng.Pos + Vector( 0, 0, 36 )
-				if ( SERVER && IsValid( self.Owner ) && self.Owner:IsPlayer() && self.Owner:Crouching() ) then PosAng.Pos = PosAng.Pos - Vector( 0, 0, 18 ) end
+				if ( SERVER && IsValid( owner ) && owner:IsPlayer() && owner:Crouching() ) then PosAng.Pos = PosAng.Pos - Vector( 0, 0, 18 ) end
 				PosAng.Ang.p = 0
 			end
 
@@ -728,9 +741,9 @@ function SWEP:GetSaberPosAng( num, side )
 		end
 
 		if ( bone ) then
-			local pos, ang = self.Owner:GetBonePosition( bone )
-			if ( pos == self.Owner:GetPos() ) then
-				local matrix = self.Owner:GetBoneMatrix( bone )
+			local pos, ang = owner:GetBonePosition( bone )
+			if ( pos == owner:GetPos() ) then
+				local matrix = owner:GetBoneMatrix( bone )
 				if ( matrix ) then
 					pos = matrix:GetTranslation()
 					ang = matrix:GetAngles()
@@ -761,7 +774,7 @@ function SWEP:GetSaberPosAng( num, side )
 
 	local defPos = self:GetPos() + defAng:Right() * 0.6 - defAng:Up() * 0.2 + defAng:Forward() * 0.8
 	if ( SERVER ) then defPos = defPos + Vector( 0, 0, 36 ) end
-	if ( SERVER && IsValid( self.Owner ) && self.Owner:Crouching() ) then defPos = defPos - Vector( 0, 0, 18 ) end
+	if ( SERVER && IsValid( owner ) && owner:Crouching() ) then defPos = defPos - Vector( 0, 0, 18 ) end
 
 	return defPos, -defAng:Forward()
 end
@@ -778,9 +791,10 @@ function SWEP:Think()
 		self:SetModel( self:GetWorldModel() )
 	end
 
+	local owner = self:GetOwner()
 	local selectedForcePower = self:GetActiveForcePowerType( self:GetForceType() )
-	if ( selectedForcePower && selectedForcePower.think && !self.Owner:KeyDown( IN_USE ) ) then
-		local ret = hook.Run( "CanUseLightsaberForcePower", self.Owner, selectedForcePower.name )
+	if ( selectedForcePower && selectedForcePower.think && !owner:KeyDown( IN_USE ) ) then
+		local ret = hook.Run( "CanUseLightsaberForcePower", owner, selectedForcePower.name )
 		if ( ret != false && selectedForcePower.think ) then
 			selectedForcePower.think( self )
 		end
@@ -798,7 +812,7 @@ function SWEP:Think()
 		self:SetLengthAnimation( math.Approach( self:GetLengthAnimation(), 1, FrameTime() * 10 ) )
 	end
 
-	if ( self:GetEnabled() && !self:GetWorksUnderwater() && IsPlayerUnderWater( self.Owner ) ) then
+	if ( self:GetEnabled() && !self:GetWorksUnderwater() && IsPlayerUnderWater( owner ) ) then
 		self:SetEnabled( false )
 		--self:EmitSound( self:GetOffSound() )
 	end
@@ -815,14 +829,14 @@ function SWEP:Think()
 	local trace = util.TraceLine( {
 		start = pos,
 		endpos = pos + ang * self:GetBladeLength(),
-		filter = { self, self.Owner },
+		filter = { self, owner },
 		--mins = Vector( -1, -1, -1 ) * self:GetBladeWidth() / 8,
 		--maxs = Vector( 1, 1, 1 ) * self:GetBladeWidth() / 8
 	} )
 	local traceBack = util.TraceLine( {
 		start = pos + ang * self:GetBladeLength(),
 		endpos = pos,
-		filter = { self, self.Owner },
+		filter = { self, owner },
 		--mins = Vector( -1, -1, -1 ) * self:GetBladeWidth() / 8,
 		--maxs = Vector( 1, 1, 1 ) * self:GetBladeWidth() / 8
 	} )
@@ -849,14 +863,14 @@ function SWEP:Think()
 		local trace2 = util.TraceLine( {
 			start = pos2,
 			endpos = pos2 + dir2 * self:GetBladeLength(),
-			filter = { self, self.Owner },
+			filter = { self, owner },
 			--mins = Vector( -1, -1, -1 ) * self:GetBladeWidth() / 8,
 			--maxs = Vector( 1, 1, 1 ) * self:GetBladeWidth() / 8
 		} )
 		local traceBack2 = util.TraceLine( {
 			start = pos2 + dir2 * self:GetBladeLength(),
 			endpos = pos2,
-			filter = { self, self.Owner },
+			filter = { self, owner },
 			--mins = Vector( -1, -1, -1 ) * self:GetBladeWidth() / 8,
 			--maxs = Vector( 1, 1, 1 ) * self:GetBladeWidth() / 8
 		} )
@@ -940,23 +954,24 @@ KnifeHoldType[ ACT_MP_SWIM ] = index + 9
 
 function SWEP:TranslateActivity( act )
 
-	if ( self.Owner:IsNPC() ) then
+	local owner = self:GetOwner()
+	if ( owner:IsNPC() ) then
 		if ( self.ActivityTranslateAI[ act ] ) then return self.ActivityTranslateAI[ act ] end
 		return -1
 	end
 
-	if ( self.Owner:Crouching() ) then
+	if ( owner:Crouching() ) then
 		local tr = util.TraceHull( {
-			start = self.Owner:GetShootPos(),
-			endpos = self.Owner:GetShootPos() + Vector( 0, 0, 20 ),
-			mins = self.Owner:OBBMins(),
-			maxs = self.Owner:OBBMaxs(),
-			filter = self.Owner
+			start = owner:GetShootPos(),
+			endpos = owner:GetShootPos() + Vector( 0, 0, 20 ),
+			mins = owner:OBBMins(),
+			maxs = owner:OBBMaxs(),
+			filter = owner
 		} )
 
 		if ( self:GetEnabled() && tr.Hit && act == ACT_MP_ATTACK_CROUCH_PRIMARYFIRE ) then return ACT_HL2MP_IDLE_KNIFE + 5 end
 
-		if ( ( !self:GetEnabled() && self:GetHoldType() == "normal" ) && self.Owner:Crouching() && act == ACT_MP_CROUCH_IDLE ) then return ACT_HL2MP_IDLE_KNIFE + 3 end
+		if ( ( !self:GetEnabled() && self:GetHoldType() == "normal" ) && owner:Crouching() && act == ACT_MP_CROUCH_IDLE ) then return ACT_HL2MP_IDLE_KNIFE + 3 end
 		if ( ( ( !self:GetEnabled() && self:GetHoldType() == "normal" ) or ( self:GetEnabled() && tr.Hit ) ) && act == ACT_MP_CROUCH_IDLE ) then return ACT_HL2MP_IDLE_KNIFE + 3 end
 		if ( ( ( !self:GetEnabled() && self:GetHoldType() == "normal" ) or ( self:GetEnabled() && tr.Hit ) ) && act == ACT_MP_CROUCHWALK ) then return ACT_HL2MP_IDLE_KNIFE + 4 end
 
@@ -1287,8 +1302,9 @@ function SWEP:DrawHUD_FuckedUpHooks( y )
 	----------------------------------- PLAYERMODEL ERROR
 
 	if ( self:GetIncorrectPlayerModel() != 0 ) then
-		local txt = "Server is missing the player model files!\nPlayer model: " .. self.Owner:GetModel()
-		if ( self:GetIncorrectPlayerModel() == 2 ) then txt = "The weapon is somehow missing owner!\nPlayer model: " .. self.Owner:GetModel() end
+		local owner = self:GetOwner()
+		local txt = "Server is missing the player model files!\nPlayer model: " .. owner:GetModel()
+		if ( self:GetIncorrectPlayerModel() == 2 ) then txt = "The weapon is somehow missing owner!\nPlayer model: " .. owner:GetModel() end
 		local tW, tH = surface.GetTextSize( txt )
 
 		y = y - tH - gap
@@ -1403,7 +1419,6 @@ local function DrawForceSelectionHUD( ForceSelectionEnabled, Force, MaxForce, Se
 		end
 
 		-- Label
-
 		surface.SetFont( "SelectedForceType" )
 		local txt = selectedForcePower.name or ""
 		local tW2, tH2 = surface.GetTextSize( txt )
@@ -1437,7 +1452,8 @@ end
 
 function SWEP:DrawHUD()
 
-	if ( !IsValid( self.Owner ) or self.Owner:GetViewEntity() != self.Owner or self.Owner:InVehicle() ) then return end
+	local owner = self:GetOwner()
+	if ( !IsValid( owner ) or owner:GetViewEntity() != owner or owner:InVehicle() ) then return end
 
 	-----------------------------------
 

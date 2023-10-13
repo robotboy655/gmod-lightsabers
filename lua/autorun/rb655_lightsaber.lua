@@ -122,15 +122,17 @@ rb655_AddForcePower( {
 	think = function( self )
 		if ( self:GetNextSecondaryFire() > CurTime() ) then return end
 		if ( self:GetForce() < 1 or CLIENT ) then return end
-		if ( !self.Owner:KeyDown( IN_ATTACK2 ) && !self.Owner:KeyReleased( IN_ATTACK2 ) ) then return end
+
+		local owner = self:GetOwner()
+		if ( !owner:KeyDown( IN_ATTACK2 ) && !owner:KeyReleased( IN_ATTACK2 ) ) then return end
 		if ( !self._ForceRepulse && self:GetForce() < 16 ) then return end
 
-		if ( !self.Owner:KeyReleased( IN_ATTACK2 ) ) then
+		if ( !owner:KeyReleased( IN_ATTACK2 ) ) then
 			if ( !self._ForceRepulse ) then self:SetForce( self:GetForce() - 16 ) self._ForceRepulse = 1 end
 
 			if ( !self.NextForceEffect or self.NextForceEffect < CurTime() ) then
 				local ed = EffectData()
-				ed:SetOrigin( self.Owner:GetPos() + Vector( 0, 0, 36 ) )
+				ed:SetOrigin( owner:GetPos() + Vector( 0, 0, 36 ) )
 				ed:SetRadius( 128 * self._ForceRepulse )
 				util.Effect( "rb655_force_repulse_in", ed, true, true )
 
@@ -146,13 +148,13 @@ rb655_AddForcePower( {
 
 		local maxdist = 128 * self._ForceRepulse
 
-		for _, e in ipairs( ents.FindInSphere( self.Owner:GetPos(), maxdist ) ) do
-			if ( e == self.Owner ) then continue end
+		for _, e in ipairs( ents.FindInSphere( owner:GetPos(), maxdist ) ) do
+			if ( e == owner ) then continue end
 
-			local dist = self.Owner:GetPos():Distance( e:GetPos() )
+			local dist = owner:GetPos():Distance( e:GetPos() )
 			local mul = ( maxdist - dist ) / 256
 
-			local v = ( self.Owner:GetPos() - e:GetPos() ):GetNormalized()
+			local v = ( owner:GetPos() - e:GetPos() ):GetNormalized()
 			v.z = 0
 
 			if ( e:IsNPC() && util.IsValidRagdoll( e:GetModel() or "" ) ) then
@@ -166,8 +168,8 @@ rb655_AddForcePower( {
 					dmg:SetDamage( e:Health() * 3 )
 				end
 				dmg:SetDamageForce( -v * math.min( mul * 40000, 80000 ) )
-				dmg:SetInflictor( self.Owner )
-				dmg:SetAttacker( self.Owner )
+				dmg:SetInflictor( owner )
+				dmg:SetAttacker( owner )
 				e:TakeDamageInfo( dmg )
 
 				if ( e:IsOnGround() ) then
@@ -188,7 +190,7 @@ rb655_AddForcePower( {
 		end
 
 		local ed = EffectData()
-		ed:SetOrigin( self.Owner:GetPos() + Vector( 0, 0, 36 ) )
+		ed:SetOrigin( owner:GetPos() + Vector( 0, 0, 36 ) )
 		ed:SetRadius( maxdist )
 		util.Effect( "rb655_force_repulse_out", ed, true, true )
 
@@ -251,6 +253,7 @@ rb655_AddForcePower( {
 	action = function( self )
 		if ( self:GetForce() < 3 or CLIENT ) then return end
 
+		local owner = self:GetOwner()
 		local foundents = 0
 		for id, ent in ipairs( self:SelectTargets( 3 ) ) do
 			if ( !IsValid( ent ) ) then continue end
@@ -262,10 +265,10 @@ rb655_AddForcePower( {
 			util.Effect( "rb655_force_lighting", ed, true, true )
 
 			local dmg = DamageInfo()
-			dmg:SetAttacker( self.Owner or self )
-			dmg:SetInflictor( self.Owner or self )
+			dmg:SetAttacker( owner or self )
+			dmg:SetInflictor( owner or self )
 
-			dmg:SetDamage( math.Clamp( 512 / self.Owner:GetPos():Distance( ent:GetPos() ), 1, 10 ) )
+			dmg:SetDamage( math.Clamp( 512 / owner:GetPos():Distance( ent:GetPos() ), 1, 10 ) )
 			if ( ent:IsNPC() ) then dmg:SetDamage( 4 ) end
 			ent:TakeDamageInfo( dmg )
 
@@ -274,7 +277,7 @@ rb655_AddForcePower( {
 		if ( foundents > 0 ) then
 			self:SetForce( self:GetForce() - foundents )
 			if ( !self.SoundLightning ) then
-				self.SoundLightning = CreateSound( self.Owner, "lightsaber/force_lightning" .. math.random( 1, 2 ) .. ".wav" )
+				self.SoundLightning = CreateSound( owner, "lightsaber/force_lightning" .. math.random( 1, 2 ) .. ".wav" )
 				self.SoundLightning:Play()
 			else
 				self.SoundLightning:Play()
@@ -294,14 +297,15 @@ rb655_AddForcePower( {
 	action = function( self )
 		if ( self:GetForce() < 16 or CLIENT ) then return end
 
-		for id, ent in pairs( ents.FindInCone( self.Owner:GetShootPos(), self.Owner:GetAimVector(), 500, .01 ) ) do--self:SelectTargets( 5 ) ) do
+		local owner = self:GetOwner()
+		for id, ent in pairs( ents.FindInCone( owner:GetShootPos(), owner:GetAimVector(), 500, .01 ) ) do--self:SelectTargets( 5 ) ) do
 
-		if ( ent == self.Owner or ent:GetParent() == self.Owner or ent:GetMoveType() == 0 ) then continue end
+		if ( ent == owner or ent:GetParent() == owner or ent:GetMoveType() == 0 ) then continue end
 		print( id, ent, ent:GetMoveType() )
-			ent:SetVelocity( self.Owner:GetAimVector() * 5000 )
+			ent:SetVelocity( owner:GetAimVector() * 5000 )
 			if ( IsValid( ent:GetPhysicsObject() ) ) then
 				for i = 0, ent:GetPhysicsObjectCount() - 1 do
-					ent:GetPhysicsObjectNum( i ):SetVelocity( self.Owner:GetAimVector() * 5000 )
+					ent:GetPhysicsObjectNum( i ):SetVelocity( owner:GetAimVector() * 5000 )
 				end
 			end
 		end
@@ -318,6 +322,7 @@ rb655_AddForcePower( {
 	action = function( self )
 		if ( self:GetForce() < 3 or CLIENT ) then return end
 
+		local owner = self:GetOwner()
 		for id, ent in pairs( self:SelectTargets( 3 ) ) do
 			if ( !IsValid( ent ) or ent:GetClass() != "npc_metropolice" or ent.Chocked ) then continue end
 			ent.Chocked = true
@@ -340,8 +345,8 @@ rb655_AddForcePower( {
 
 			timer.Create( "test_22_" .. ent:EntIndex(), time + 3, 1, function() if ( !IsValid( ent ) ) then return end
 				local dmg = DamageInfo()
-				dmg:SetAttacker( self.Owner or self )
-				dmg:SetInflictor( self.Owner or self )
+				dmg:SetAttacker( owner or self )
+				dmg:SetInflictor( owner or self )
 
 				dmg:SetDamage( 400 )
 				ent:TakeDamageInfo( dmg )
@@ -378,7 +383,8 @@ end
 
 hook.Add( "PostEntityTakeDamage", "rb655_lightsaber_kill_snd", function( ent, dmg, took )
 	if ( !IsValid( ent ) or !dmg or ent:IsNPC() or ent:IsPlayer() or !took ) then return end
-	if ( ent:Health() > 0 && ent:Health() - dmg:GetDamage() <= 0 ) then
+
+	if ( ent:Health() > 0 && ( ent:Health() - dmg:GetDamage() ) <= 0 ) then
 		local infl = dmg:GetInflictor()
 		if ( !IsValid( infl ) && IsValid( dmg:GetAttacker() ) && dmg:GetAttacker().GetActiveWeapon ) then -- Ugly fucking haxing workaround, thanks VOLVO
 			infl = dmg:GetAttacker():GetActiveWeapon()
