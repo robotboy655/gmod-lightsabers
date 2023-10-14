@@ -31,10 +31,35 @@ function rb655_DrawHit( trace, isBack )
 	local pos = trace.HitPos
 	local dir = trace.HitNormal
 
-	local effectdata = EffectData()
-	effectdata:SetOrigin( pos )
-	effectdata:SetNormal( dir )
-	util.Effect( "StunstickImpact", effectdata, true, true )
+	if ( trace.MatType == MAT_FLESH ) then
+		local effectdata = EffectData()
+		effectdata:SetOrigin( pos )
+		effectdata:SetNormal( dir )
+		util.Effect( "BloodImpact", effectdata, true, true )
+		return
+	--[[elseif ( trace.MatType == MAT_CONCRETE ) then
+		local effectdata = EffectData()
+		effectdata:SetOrigin( pos )
+		effectdata:SetStart( pos + dir )
+		util.Effect( "AirboatGunImpact", effectdata, true, true )]]
+	elseif ( trace.MatType == MAT_GLASS ) then
+		local effectdata = EffectData()
+		effectdata:SetOrigin( pos )
+		effectdata:SetNormal( dir )
+		util.Effect( "GlassImpact", effectdata, true, true )
+		return
+	else
+		--[[local effectdata = EffectData()
+		effectdata:SetOrigin( pos )
+		effectdata:SetNormal( dir )
+		util.Effect( "StunstickImpact", effectdata, true, true )]]
+
+		local effectdata = EffectData()
+		effectdata:SetOrigin( pos )
+		effectdata:SetNormal( dir )
+		effectdata:SetMaterialIndex( trace.MatType )
+		util.Effect( "rb655_saber_impact", effectdata, true, true )
+	end
 
 	--util.Decal( "LSScorch", pos + dir, pos - dir )
 	util.Decal( "FadingScorch", pos + dir, pos - dir )
@@ -384,7 +409,7 @@ end
 hook.Add( "PostEntityTakeDamage", "rb655_lightsaber_kill_snd", function( ent, dmg, took )
 	if ( !IsValid( ent ) or !dmg or ent:IsNPC() or ent:IsPlayer() or !took ) then return end
 
-	if ( ent:Health() > 0 && ( ent:Health() - dmg:GetDamage() ) <= 0 ) then
+	if ( ent:Health() != 0 && ( ent:Health() - dmg:GetDamage() ) <= 0 ) then
 		local infl = dmg:GetInflictor()
 		if ( !IsValid( infl ) && IsValid( dmg:GetAttacker() ) && dmg:GetAttacker().GetActiveWeapon ) then -- Ugly fucking haxing workaround, thanks VOLVO
 			infl = dmg:GetAttacker():GetActiveWeapon()
