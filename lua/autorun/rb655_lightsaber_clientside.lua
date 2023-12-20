@@ -345,8 +345,8 @@ end
 -- Try to be faster.. This is kinda ugly
 local ents_FindByClass = ents.FindByClass
 local inext = ipairs( {} )
-local LightsaberWCache = nil
-local LightsaberECache = nil
+local LightsaberWCache = ents_FindByClass( "weapon_lightsaber*" )
+local LightsaberECache = ents_FindByClass( "ent_lightsaber*" )
 
 local function rb655_lightsaberW_iterator()
 	if ( LightsaberWCache == nil ) then LightsaberWCache = ents_FindByClass( "weapon_lightsaber*" ) end
