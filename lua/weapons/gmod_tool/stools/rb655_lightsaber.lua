@@ -42,7 +42,7 @@ TOOL.ClientConVar[ "offsound" ] = "lightsaber/saber_off1.wav"
 cleanup.Register( "ent_lightsabers" )
 
 if ( SERVER ) then
-	CreateConVar( "sbox_maxent_lightsabers", 2 )
+	CreateConVar( "sbox_maxent_lightsabers", 2, FCVAR_ARCHIVE + FCVAR_REPLICATED + FCVAR_NOTIFY )
 
 	function MakeLightsaber( ply, model, pos, ang, LoopSound, SwingSound, OnSound, OffSound )
 		if ( IsValid( ply ) and !ply:CheckLimit( "ent_lightsabers" ) ) then return false end
