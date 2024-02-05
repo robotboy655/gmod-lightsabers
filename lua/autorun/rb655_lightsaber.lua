@@ -124,8 +124,8 @@ rb655_AddForcePower( {
 		if ( self:GetForce() < 1 or CLIENT ) then return end
 
 		local owner = self:GetOwner()
-		if ( !owner:KeyDown( IN_ATTACK2 ) && !owner:KeyReleased( IN_ATTACK2 ) ) then return end
-		if ( !self._ForceRepulse && self:GetForce() < 16 ) then return end
+		if ( !owner:KeyDown( IN_ATTACK2 ) and !owner:KeyReleased( IN_ATTACK2 ) ) then return end
+		if ( !self._ForceRepulse and self:GetForce() < 16 ) then return end
 
 		if ( !owner:KeyReleased( IN_ATTACK2 ) ) then
 			if ( !self._ForceRepulse ) then self:SetForce( self:GetForce() - 16 ) self._ForceRepulse = 1 end
@@ -157,7 +157,7 @@ rb655_AddForcePower( {
 			local v = ( owner:GetPos() - e:GetPos() ):GetNormalized()
 			v.z = 0
 
-			if ( e:IsNPC() && util.IsValidRagdoll( e:GetModel() or "" ) ) then
+			if ( e:IsNPC() and util.IsValidRagdoll( e:GetModel() or "" ) ) then
 
 				local dmg = DamageInfo()
 				dmg:SetDamagePosition( e:GetPos() + e:OBBCenter() )
@@ -178,9 +178,9 @@ rb655_AddForcePower( {
 					e:SetVelocity( v * mul * -1024 + Vector( 0, 0, 64 ) )
 				end
 
-			elseif ( e:IsPlayer() && e:IsOnGround() ) then
+			elseif ( e:IsPlayer() and e:IsOnGround() ) then
 				e:SetVelocity( v * mul * -2048 + Vector( 0, 0, 64 ) )
-			elseif ( e:IsPlayer() && !e:IsOnGround() ) then
+			elseif ( e:IsPlayer() and !e:IsOnGround() ) then
 				e:SetVelocity( v * mul * -384 + Vector( 0, 0, 64 ) )
 			elseif ( e:GetPhysicsObjectCount() > 0 ) then
 				for i = 0, e:GetPhysicsObjectCount() - 1 do
@@ -384,9 +384,9 @@ end
 hook.Add( "PostEntityTakeDamage", "rb655_lightsaber_kill_snd", function( ent, dmg, took )
 	if ( !IsValid( ent ) or !dmg or ent:IsNPC() or ent:IsPlayer() or !took ) then return end
 
-	if ( ent:Health() > 0 && ( ent:Health() - dmg:GetDamage() ) <= 0 ) then
+	if ( ent:Health() > 0 and ( ent:Health() - dmg:GetDamage() ) <= 0 ) then
 		local infl = dmg:GetInflictor()
-		if ( !IsValid( infl ) && IsValid( dmg:GetAttacker() ) && dmg:GetAttacker().GetActiveWeapon ) then -- Ugly fucking haxing workaround, thanks VOLVO
+		if ( !IsValid( infl ) and IsValid( dmg:GetAttacker() ) and dmg:GetAttacker().GetActiveWeapon ) then -- Ugly fucking haxing workaround, thanks VOLVO
 			infl = dmg:GetAttacker():GetActiveWeapon()
 		end
 
@@ -395,12 +395,12 @@ hook.Add( "PostEntityTakeDamage", "rb655_lightsaber_kill_snd", function( ent, dm
 end )
 
 hook.Add( "PlayerDeath", "rb655_lightsaber_kill_snd_ply", function( victim, inflictor, attacker )
-	if ( !IsValid( inflictor ) && IsValid( attacker ) && attacker.GetActiveWeapon ) then inflictor = attacker:GetActiveWeapon() end -- Ugly fucking haxing workaround, thanks VOLVO
+	if ( !IsValid( inflictor ) and IsValid( attacker ) and attacker.GetActiveWeapon ) then inflictor = attacker:GetActiveWeapon() end -- Ugly fucking haxing workaround, thanks VOLVO
 	DoSliceSound( victim, inflictor )
 end )
 
 hook.Add( "OnNPCKilled", "rb655_lightsaber_kill_snd_npc", function( victim, attacker, inflictor )
-	if ( !IsValid( inflictor ) && IsValid( attacker ) && attacker.GetActiveWeapon ) then inflictor = attacker:GetActiveWeapon() end -- Ugly fucking haxing workaround, thanks VOLVO
+	if ( !IsValid( inflictor ) and IsValid( attacker ) and attacker.GetActiveWeapon ) then inflictor = attacker:GetActiveWeapon() end -- Ugly fucking haxing workaround, thanks VOLVO
 	DoSliceSound( victim, inflictor )
 end )
 
@@ -412,7 +412,7 @@ if ( SERVER ) then
 end
 
 local function IsKickbackAllowed()
-	if ( cvar && cvar:GetBool() ) then return true end
+	if ( cvar and cvar:GetBool() ) then return true end
 	return false
 end
 
@@ -428,10 +428,10 @@ local rb655_ls_nodamage = {
 function rb655_LS_DoDamage( tr, wep )
 	local ent = tr.Entity
 
-	if ( !IsValid( ent ) or ( ent:Health() <= 0 && ent:GetClass() != "prop_ragdoll" ) or rb655_ls_nodamage[ ent:GetClass() ] ) then return end
+	if ( !IsValid( ent ) or ( ent:Health() <= 0 and ent:GetClass() != "prop_ragdoll" ) or rb655_ls_nodamage[ ent:GetClass() ] ) then return end
 
 	local dmg = hook.Run( "CanLightsaberDamageEntity", ent, wep, tr )
-	if ( isbool( dmg ) && dmg == false ) then return end
+	if ( isbool( dmg ) and dmg == false ) then return end
 
 	local dmginfo = DamageInfo()
 	dmginfo:SetDamageForce( tr.HitNormal * -13.37 )

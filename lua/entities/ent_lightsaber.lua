@@ -94,9 +94,9 @@ end
 
 function ENT:OnEnabled()
 	if ( CLIENT ) then return end
-	if ( self:WaterLevel() > 2 && !self:GetWorksUnderwater() ) then return end
+	if ( self:WaterLevel() > 2 and !self:GetWorksUnderwater() ) then return end
 
-	if ( !self:GetEnabled() && self.OnSound ) then self:EmitSound( self.OnSound, nil, nil, 0.4 ) end
+	if ( !self:GetEnabled() and self.OnSound ) then self:EmitSound( self.OnSound, nil, nil, 0.4 ) end
 
 	self.SoundLoop = CreateSound( self, Sound( self.LoopSound ) )
 	if ( self.SoundLoop ) then self.SoundLoop:Play() self.SoundLoop:ChangeVolume( 0, 0 ) end
@@ -114,7 +114,7 @@ function ENT:OnDisabled( bRemove )
 		return
 	end
 
-	if ( self:GetEnabled() && self.OffSound ) then self:EmitSound( self.OffSound, nil, nil, 0.4 ) end
+	if ( self:GetEnabled() and self.OffSound ) then self:EmitSound( self.OffSound, nil, nil, 0.4 ) end
 
 	if ( self.SoundLoop ) then self.SoundLoop:Stop() self.SoundLoop = nil end
 	if ( self.SoundSwing ) then self.SoundSwing:Stop() self.SoundSwing = nil end
@@ -174,7 +174,7 @@ function ENT:Draw()
 	--render.SetColorModulation( 1, 1, 1 )
 	self:DrawModel()
 
-	if ( halo.RenderedEntity && IsValid( halo.RenderedEntity() ) && halo.RenderedEntity() == self ) then return end
+	if ( halo.RenderedEntity and IsValid( halo.RenderedEntity() ) and halo.RenderedEntity() == self ) then return end
 
 	local clr = self:GetCrystalColor() * 255
 	clr = Color( clr.x, clr.y, clr.z )
@@ -182,19 +182,19 @@ function ENT:Draw()
 	local bladesFound = false -- true if the model is OLD and does not have blade attachments
 	local blades = 0
 	for id, t in ipairs( self:GetAttachments() or {} ) do
-		if ( !string.match( t.name, "blade(%d+)" ) && !string.match( t.name, "quillon(%d+)" ) ) then continue end
+		if ( !string.match( t.name, "blade(%d+)" ) and !string.match( t.name, "quillon(%d+)" ) ) then continue end
 
 		local bladeNum = string.match( t.name, "blade(%d+)" )
 		local quillonNum = string.match( t.name, "quillon(%d+)" )
 
-		if ( bladeNum && self:LookupAttachment( "blade" .. bladeNum ) > 0 ) then
+		if ( bladeNum and self:LookupAttachment( "blade" .. bladeNum ) > 0 ) then
 			blades = blades + 1
 			local pos, dir = self:GetSaberPosAng( bladeNum )
 			rb655_RenderBlade( pos, dir, self:GetBladeLength(), self:GetMaxLength(), self:GetBladeWidth(), clr, self:GetDarkInner(), self:EntIndex(), self:WaterLevel() > 2, false, blades )
 			bladesFound = true
 		end
 
-		if ( quillonNum && self:LookupAttachment( "quillon" .. quillonNum ) > 0 ) then
+		if ( quillonNum and self:LookupAttachment( "quillon" .. quillonNum ) > 0 ) then
 			blades = blades + 1
 			local pos, dir = self:GetSaberPosAng( quillonNum, true )
 			rb655_RenderBlade( pos, dir, self:GetBladeLength(), self:GetMaxLength(), self:GetBladeWidth(), clr, self:GetDarkInner(), self:EntIndex(), self:WaterLevel() > 2, true, blades )
@@ -227,13 +227,13 @@ end
 
 function ENT:Think()
 
-	if ( !self:GetEnabled() && self:GetLengthAnimation() != 0 ) then
+	if ( !self:GetEnabled() and self:GetLengthAnimation() != 0 ) then
 		self:SetLengthAnimation( math.Approach( self:GetLengthAnimation(), 0, FrameTime() * 3 ) )
-	elseif ( self:GetEnabled() && self:GetLengthAnimation() != 1 ) then
+	elseif ( self:GetEnabled() and self:GetLengthAnimation() != 1 ) then
 		self:SetLengthAnimation( math.Approach( self:GetLengthAnimation(), 1, FrameTime() * 10 ) )
 	end
 
-	if ( self:GetEnabled() && !self:GetWorksUnderwater() && self:WaterLevel() > 2 ) then
+	if ( self:GetEnabled() and !self:GetWorksUnderwater() and self:WaterLevel() > 2 ) then
 		self:SetEnabled( false )
 		--self:EmitSound( self.OffSound )
 	end
@@ -323,13 +323,13 @@ function ENT:BladeThink( startpos, dir )
 	} )
 
 	local hit = false
-	if ( trace.Hit && !trace.StartSolid && !trace.HitSky ) then
+	if ( trace.Hit and !trace.StartSolid and !trace.HitSky ) then
 		rb655_DrawHit( trace )
 		rb655_LS_DoDamage( trace, self )
 		hit = true
 	end
 
-	if ( traceBack.Hit && !traceBack.StartSolid && !traceBack.HitSky ) then
+	if ( traceBack.Hit and !traceBack.StartSolid and !traceBack.HitSky ) then
 		rb655_DrawHit( traceBack, true )
 		rb655_LS_DoDamage( traceBack, self )
 		hit = true
@@ -340,7 +340,7 @@ end
 
 function ENT:Use( activator, caller, useType, value )
 	if ( !IsValid( activator ) or !activator:KeyPressed( IN_USE ) ) then return end
-	if ( self:WaterLevel() > 2 && !self:GetWorksUnderwater() ) then return end
+	if ( self:WaterLevel() > 2 and !self:GetWorksUnderwater() ) then return end
 
 	--[[if ( self:GetEnabled() ) then
 		self:EmitSound( self.OffSound )
@@ -377,7 +377,7 @@ function ENT:SpawnFunction( ply, tr )
 	local offSnd = ply:GetInfo( "rb655_lightsaber_offsound" )
 	local swingSnd = ply:GetInfo( "rb655_lightsaber_swingsound" )
 
-	if ( GetConVarNumber( "rb655_lightsaber_disallow_custom_content" ) > 0 && !game.SinglePlayer() ) then
+	if ( GetConVarNumber( "rb655_lightsaber_disallow_custom_content" ) > 0 and !game.SinglePlayer() ) then
 
 		if ( list.HasEntry( "LightsaberModels", mdl ) ) then ent:SetModel( mdl ) end
 

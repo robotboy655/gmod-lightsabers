@@ -58,14 +58,14 @@ local function GenerateLightingSegs( from, to, deviations, segs )
 	end
 
 	for k, v in ipairs( segments ) do
-		if ( k == 1 || k == #segments ) then continue end
+		if ( k == 1 or k == #segments ) then continue end
 
 		segments[ k ][ 1 ] = segments[ k ][ 1 ] + right * math.random( -deviations, deviations ) + up * math.random( -deviations, deviations )
 		segments[ k - 1 ][ 2 ] = segments[ k ][ 1 ]
 	end
 
 	for k, v in ipairs( segments ) do
-		if ( k == 1 || k == #segments ) then continue end
+		if ( k == 1 or k == #segments ) then continue end
 
 		if ( math.random( 0, 100 ) > 75 ) then
 			local dir = AngleRand():Forward()
@@ -92,7 +92,7 @@ local segments = {}
 --local n = 0
 local tiem = .2
 hook.Add( "PostDrawTranslucentRenderables", "", function()
-	--if ( #segments < 1 || n < CurTime() ) then
+	--if ( #segments < 1 or n < CurTime() ) then
 		--[[for i = 0, 1 do
 			table.insert( segments, {
 				segs = GenerateLighting( table.Random( ents.FindByClass( "prop_physics" ) ), table.Random( ents.FindByClass( "prop_physics" ) ), math.random( 10, 20 ), 3 ),

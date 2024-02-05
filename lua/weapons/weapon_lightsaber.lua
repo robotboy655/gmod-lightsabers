@@ -77,7 +77,7 @@ end
 
 function SWEP:PlayWeaponSound( snd, vol )
 	if ( CLIENT ) then return end
-	if ( IsValid( self:GetOwner() ) && IsValid( self:GetOwner():GetActiveWeapon() ) && self:GetOwner():GetActiveWeapon() != self ) then return end
+	if ( IsValid( self:GetOwner() ) and IsValid( self:GetOwner():GetActiveWeapon() ) and self:GetOwner():GetActiveWeapon() != self ) then return end
 
 	if ( snd == self:GetOnSound() or snd == self:GetOffSound() ) then vol = 0.4 end
 
@@ -101,24 +101,24 @@ function SWEP:SelectTargets( num )
 	for id, ply in ipairs( ents.GetAll() ) do
 		local mdl = ply:GetModel()
 		if ( !mdl or mdl == "" or ply == owner or ply:Health() < 1 ) then continue end
-		if ( string.StartWith( mdl or "", "models/gibs/" ) ) then continue end
+		if ( string.StartsWith( mdl or "", "models/gibs/" ) ) then continue end
 		if ( string.find( mdl or "", "chunk" ) ) then continue end
 		if ( string.find( mdl or "", "_shard" ) ) then continue end
 		if ( string.find( mdl or "", "_splinters" ) ) then continue end
 
 		local tr = util.TraceLine( {
 			start = owner:GetShootPos(),
-			endpos = ply.GetShootPos && ply:GetShootPos() or ply:GetPos(),
+			endpos = ply.GetShootPos and ply:GetShootPos() or ply:GetPos(),
 			filter = owner,
 		} )
 
-		if ( tr.Entity != ply && IsValid( tr.Entity ) or tr.Entity == game.GetWorld() ) then continue end
+		if ( tr.Entity != ply and IsValid( tr.Entity ) or tr.Entity == game.GetWorld() ) then continue end
 
 		local pos1 = owner:GetPos() + owner:GetAimVector() * dist
 		local pos2 = ply:GetPos()
 		local dot = owner:GetAimVector():Dot( ( owner:GetPos() - pos2 ):GetNormalized() )
 
-		if ( pos1:Distance( pos2 ) <= dist && ply:EntIndex() > 0 && mdl && mdl != "" ) then
+		if ( pos1:Distance( pos2 ) <= dist and ply:EntIndex() > 0 and mdl and mdl != "" ) then
 			table.insert( p, { ply = ply, dist = tr.HitPos:Distance( pos2 ), dot = dot, score = -dot + ( ( dist - pos1:Distance( pos2 ) ) / dist ) * 50 } )
 		end
 	end
@@ -176,7 +176,7 @@ if ( SERVER ) then
 end
 
 hook.Add( "GetFallDamage", "rb655_lightsaber_no_fall_damage", function( ply, speed )
-	if ( IsValid( ply ) && IsValid( ply:GetActiveWeapon() ) && rb655_IsLightsaber( ply:GetActiveWeapon() ) ) then
+	if ( IsValid( ply ) and IsValid( ply:GetActiveWeapon() ) and rb655_IsLightsaber( ply:GetActiveWeapon() ) ) then
 		local wep = ply:GetActiveWeapon()
 
 		if ( ply:KeyDown( IN_DUCK ) ) then
@@ -282,7 +282,7 @@ function SWEP:LoadToolValues( ply )
 	local onSnd = ply:GetInfo( "rb655_lightsaber_onsound" )
 	local offSnd = ply:GetInfo( "rb655_lightsaber_offsound" )
 	local swingSnd = ply:GetInfo( "rb655_lightsaber_swingsound" )
-	if ( GetConVarNumber( "rb655_lightsaber_disallow_custom_content" ) > 0 && !game.SinglePlayer() ) then
+	if ( GetConVarNumber( "rb655_lightsaber_disallow_custom_content" ) > 0 and !game.SinglePlayer() ) then
 		if ( list.HasEntry( "LightsaberModels", mdl ) ) then self:SetWorldModel( mdl ) end
 
 		for k, v in pairs( list.Get( "rb655_LightsaberHumSounds" ) ) do
@@ -343,7 +343,7 @@ function SWEP:Initialize()
 	self:SetWeaponHoldType( self:GetTargetHoldType() )
 
 	local owner = self:GetOwner()
-	if ( owner && owner:IsNPC() && SERVER ) then -- NPC Weapons
+	if ( owner and owner:IsNPC() and SERVER ) then -- NPC Weapons
 		--owner:Fire( "GagEnable" )
 
 		if ( owner:GetClass() == "npc_citizen" ) then
@@ -517,7 +517,7 @@ function SWEP:NPC_ChaseEnemy()
 	end
 
 	if ( owner:GetEnemy() == owner ) then owner:SetEnemy( NULL ) return end
-	if ( !self.CooldownTimer && owner:GetEnemy():GetPos():Distance( self:GetPos() ) <= 70 ) then
+	if ( !self.CooldownTimer and owner:GetEnemy():GetPos():Distance( self:GetPos() ) <= 70 ) then
 		owner:SetSchedule( SCHED_MELEE_ATTACK1 )
 		self:NPCShoot_Primary()
 	end
@@ -538,7 +538,7 @@ function SWEP:NPCThink()
 	owner:ClearCondition( 42 )
 	owner:ClearCondition( 45 )
 
-	if ( !self.NPC_NextLogicTimer && IsValid( owner:GetEnemy() ) ) then
+	if ( !self.NPC_NextLogicTimer and IsValid( owner:GetEnemy() ) ) then
 		self:NPC_NextLogic()
 	end
 
@@ -574,7 +574,7 @@ function SWEP:PrimaryAttack()
 
 	self:SetNextAttack( 0.5 )
 
-	if ( !owner:IsNPC() && self:GetEnabled() ) then
+	if ( !owner:IsNPC() and self:GetEnabled() ) then
 		owner:AnimResetGestureSlot( GESTURE_SLOT_CUSTOM )
 		owner:SetAnimation( PLAYER_ATTACK1 )
 	end
@@ -583,7 +583,7 @@ end
 function SWEP:SecondaryAttack()
 	local owner = self:GetOwner()
 	if ( !IsValid( owner ) or !self:GetActiveForcePowerType( self:GetForceType() ) ) then return end
-	if ( game.SinglePlayer() && SERVER ) then self:CallOnClient( "SecondaryAttack", "" ) end
+	if ( game.SinglePlayer() and SERVER ) then self:CallOnClient( "SecondaryAttack", "" ) end
 
 	local selectedForcePower = self:GetActiveForcePowerType( self:GetForceType() )
 	if ( !selectedForcePower ) then return end
@@ -600,7 +600,7 @@ end
 function SWEP:Reload()
 	local owner = self:GetOwner()
 	if ( !IsValid( owner ) or !owner:KeyPressed( IN_RELOAD ) ) then return end
-	if ( IsPlayerUnderWater( owner ) && !self:GetWorksUnderwater() && !self:GetEnabled() ) then return end
+	if ( IsPlayerUnderWater( owner ) and !self:GetWorksUnderwater() and !self:GetEnabled() ) then return end
 
 	self:SetEnabled( !self:GetEnabled() )
 end
@@ -610,7 +610,7 @@ end
 function SWEP:GetTargetHoldType()
 	--if ( !self:GetEnabled() ) then return "normal" end
 	if ( self:GetWorldModel() == "models/weapons/starwars/w_maul_saber_staff_hilt.mdl" ) then return "knife" end
-	if ( self:LookupAttachment( "blade2" ) && self:LookupAttachment( "blade2" ) > 0 ) then return "knife" end
+	if ( self:LookupAttachment( "blade2" ) and self:LookupAttachment( "blade2" ) > 0 ) then return "knife" end
 
 	return "melee2"
 end
@@ -619,9 +619,9 @@ end
 
 function SWEP:OnEnabled( bDeploy )
 	local owner = self:GetOwner()
-	if ( ( !self:GetEnabled() or bDeploy ) && IsValid( owner ) ) then self:PlayWeaponSound( self:GetOnSound() ) end
+	if ( ( !self:GetEnabled() or bDeploy ) and IsValid( owner ) ) then self:PlayWeaponSound( self:GetOnSound() ) end
 
-	if ( CLIENT or ( self:GetEnabled() && !bDeploy ) ) then return end
+	if ( CLIENT or ( self:GetEnabled() and !bDeploy ) ) then return end
 
 	self:SetHoldType( self:GetTargetHoldType() )
 	timer.Remove( "rb655_ls_ht" .. self:EntIndex() )
@@ -673,7 +673,7 @@ function SWEP:OnDrop()
 end
 
 function SWEP:OnRemove()
-	if ( self:GetEnabled() && IsValid( self:GetOwner() ) ) then self:PlayWeaponSound( self:GetOffSound() ) end
+	if ( self:GetEnabled() and IsValid( self:GetOwner() ) ) then self:PlayWeaponSound( self:GetOffSound() ) end
 	self:OnDisabled( true )
 end
 
@@ -681,7 +681,7 @@ function SWEP:Deploy()
 
 	local ply = self:GetOwner()
 
-	if ( ply:IsPlayer() && !ply:IsBot() && !self.WeaponSynched && SERVER && GAMEMODE.IsSandboxDerived ) then
+	if ( ply:IsPlayer() and !ply:IsBot() and !self.WeaponSynched and SERVER and GAMEMODE.IsSandboxDerived ) then
 		self:LoadToolValues( ply )
 
 		-- We only want to do this in Sandbox, not any derivatives
@@ -694,7 +694,7 @@ function SWEP:Deploy()
 
 	if ( CLIENT ) then return end
 
-	if ( ply:IsPlayer() && ply:FlashlightIsOn() ) then ply:Flashlight( false ) end
+	if ( ply:IsPlayer() and ply:FlashlightIsOn() ) then ply:Flashlight( false ) end
 
 	self:SetLengthAnimation( 0 ) -- Reinitialize the effect
 
@@ -724,16 +724,16 @@ function SWEP:GetSaberPosAng( num, side )
 			attachment = self:LookupAttachment( "quillon" .. num )
 		end
 
-		if ( !bone && SERVER ) then
+		if ( !bone and SERVER ) then
 			self:SetIncorrectPlayerModel( 1 )
 		end
 
-		if ( attachment && attachment > 0 ) then
+		if ( attachment and attachment > 0 ) then
 			local PosAng = self:GetAttachment( attachment )
 
-			if ( !bone && SERVER ) then
+			if ( !bone and SERVER ) then
 				PosAng.Pos = PosAng.Pos + Vector( 0, 0, 36 )
-				if ( SERVER && IsValid( owner ) && owner:IsPlayer() && owner:Crouching() ) then PosAng.Pos = PosAng.Pos - Vector( 0, 0, 18 ) end
+				if ( SERVER and IsValid( owner ) and owner:IsPlayer() and owner:Crouching() ) then PosAng.Pos = PosAng.Pos - Vector( 0, 0, 18 ) end
 				PosAng.Ang.p = 0
 			end
 
@@ -774,7 +774,7 @@ function SWEP:GetSaberPosAng( num, side )
 
 	local defPos = self:GetPos() + defAng:Right() * 0.6 - defAng:Up() * 0.2 + defAng:Forward() * 0.8
 	if ( SERVER ) then defPos = defPos + Vector( 0, 0, 36 ) end
-	if ( SERVER && IsValid( owner ) && owner:Crouching() ) then defPos = defPos - Vector( 0, 0, 18 ) end
+	if ( SERVER and IsValid( owner ) and owner:Crouching() ) then defPos = defPos - Vector( 0, 0, 18 ) end
 
 	return defPos, -defAng:Forward()
 end
@@ -793,9 +793,9 @@ function SWEP:Think()
 
 	local owner = self:GetOwner()
 	local selectedForcePower = self:GetActiveForcePowerType( self:GetForceType() )
-	if ( selectedForcePower && selectedForcePower.think && !owner:KeyDown( IN_USE ) ) then
+	if ( selectedForcePower and selectedForcePower.think and !owner:KeyDown( IN_USE ) ) then
 		local ret = hook.Run( "CanUseLightsaberForcePower", owner, selectedForcePower.name )
-		if ( ret != false && selectedForcePower.think ) then
+		if ( ret != false and selectedForcePower.think ) then
 			selectedForcePower.think( self )
 		end
 	end
@@ -806,13 +806,13 @@ function SWEP:Think()
 		self:SetForce( math.min( self:GetForce() + 0.5, self:GetMaxForce() ) )
 	end
 
-	if ( !self:GetEnabled() && self:GetLengthAnimation() != 0 ) then
+	if ( !self:GetEnabled() and self:GetLengthAnimation() != 0 ) then
 		self:SetLengthAnimation( math.Approach( self:GetLengthAnimation(), 0, FrameTime() * 3 ) )
-	elseif ( self:GetEnabled() && self:GetLengthAnimation() != 1 ) then
+	elseif ( self:GetEnabled() and self:GetLengthAnimation() != 1 ) then
 		self:SetLengthAnimation( math.Approach( self:GetLengthAnimation(), 1, FrameTime() * 10 ) )
 	end
 
-	if ( self:GetEnabled() && !self:GetWorksUnderwater() && IsPlayerUnderWater( owner ) ) then
+	if ( self:GetEnabled() and !self:GetWorksUnderwater() and IsPlayerUnderWater( owner ) ) then
 		self:SetEnabled( false )
 		--self:EmitSound( self:GetOffSound() )
 	end
@@ -844,14 +844,14 @@ function SWEP:Think()
 	--if ( SERVER ) then debugoverlay.Line( trace.StartPos, trace.HitPos, .1, Color( 255, 0, 0 ), false ) end
 
 	-- When the blade is outside of the world
-	if ( trace.HitSky or ( trace.StartSolid && trace.HitWorld ) ) then trace.Hit = false end
-	if ( traceBack.HitSky or ( traceBack.StartSolid && traceBack.HitWorld ) ) then traceBack.Hit = false end
+	if ( trace.HitSky or ( trace.StartSolid and trace.HitWorld ) ) then trace.Hit = false end
+	if ( traceBack.HitSky or ( traceBack.StartSolid and traceBack.HitWorld ) ) then traceBack.Hit = false end
 
 	self:DrawHitEffects( trace, traceBack )
 	isTrace1Hit = trace.Hit or traceBack.Hit
 
 	-- Don't deal the damage twice to the same entity
-	if ( traceBack.Entity == trace.Entity && IsValid( trace.Entity ) ) then traceBack.Hit = false end
+	if ( traceBack.Entity == trace.Entity and IsValid( trace.Entity ) ) then traceBack.Hit = false end
 
 	if ( trace.Hit ) then rb655_LS_DoDamage( trace, self ) end
 	if ( traceBack.Hit ) then rb655_LS_DoDamage( traceBack, self ) end
@@ -875,20 +875,20 @@ function SWEP:Think()
 			--maxs = Vector( 1, 1, 1 ) * self:GetBladeWidth() / 8
 		} )
 
-		if ( trace2.HitSky or ( trace2.StartSolid && trace2.HitWorld ) ) then trace2.Hit = false end
-		if ( traceBack2.HitSky or ( traceBack2.StartSolid && traceBack2.HitWorld ) ) then traceBack2.Hit = false end
+		if ( trace2.HitSky or ( trace2.StartSolid and trace2.HitWorld ) ) then trace2.Hit = false end
+		if ( traceBack2.HitSky or ( traceBack2.StartSolid and traceBack2.HitWorld ) ) then traceBack2.Hit = false end
 
 		self:DrawHitEffects( trace2, traceBack2 )
 		isTrace2Hit = trace2.Hit or traceBack2.Hit
 
-		if ( traceBack2.Entity == trace2.Entity && IsValid( trace2.Entity ) ) then traceBack2.Hit = false end
+		if ( traceBack2.Entity == trace2.Entity and IsValid( trace2.Entity ) ) then traceBack2.Hit = false end
 
 		if ( trace2.Hit ) then rb655_LS_DoDamage( trace2, self ) end
 		if ( traceBack2.Hit ) then rb655_LS_DoDamage( traceBack2, self ) end
 
 	end
 
-	if ( ( isTrace1Hit or isTrace2Hit ) && self.SoundHit ) then
+	if ( ( isTrace1Hit or isTrace2Hit ) and self.SoundHit ) then
 		self.SoundHit:ChangeVolume( 0.1, 0 )
 	elseif ( self.SoundHit ) then
 		self.SoundHit:ChangeVolume( 0, 0 )
@@ -926,11 +926,11 @@ end
 function SWEP:DrawHitEffects( trace, traceBack )
 	if ( self:GetBladeLength() <= 0 ) then return end
 
-	if ( trace.Hit && !trace.StartSolid ) then
+	if ( trace.Hit and !trace.StartSolid ) then
 		rb655_DrawHit( trace )
 	end
 
-	if ( traceBack && traceBack.Hit && !traceBack.StartSolid ) then
+	if ( traceBack and traceBack.Hit and !traceBack.StartSolid ) then
 		rb655_DrawHit( traceBack, true )
 	end
 end
@@ -969,15 +969,15 @@ function SWEP:TranslateActivity( act )
 			filter = owner
 		} )
 
-		if ( self:GetEnabled() && tr.Hit && act == ACT_MP_ATTACK_CROUCH_PRIMARYFIRE ) then return ACT_HL2MP_IDLE_KNIFE + 5 end
+		if ( self:GetEnabled() and tr.Hit and act == ACT_MP_ATTACK_CROUCH_PRIMARYFIRE ) then return ACT_HL2MP_IDLE_KNIFE + 5 end
 
-		if ( ( !self:GetEnabled() && self:GetHoldType() == "normal" ) && owner:Crouching() && act == ACT_MP_CROUCH_IDLE ) then return ACT_HL2MP_IDLE_KNIFE + 3 end
-		if ( ( ( !self:GetEnabled() && self:GetHoldType() == "normal" ) or ( self:GetEnabled() && tr.Hit ) ) && act == ACT_MP_CROUCH_IDLE ) then return ACT_HL2MP_IDLE_KNIFE + 3 end
-		if ( ( ( !self:GetEnabled() && self:GetHoldType() == "normal" ) or ( self:GetEnabled() && tr.Hit ) ) && act == ACT_MP_CROUCHWALK ) then return ACT_HL2MP_IDLE_KNIFE + 4 end
+		if ( ( !self:GetEnabled() and self:GetHoldType() == "normal" ) and owner:Crouching() and act == ACT_MP_CROUCH_IDLE ) then return ACT_HL2MP_IDLE_KNIFE + 3 end
+		if ( ( ( !self:GetEnabled() and self:GetHoldType() == "normal" ) or ( self:GetEnabled() and tr.Hit ) ) and act == ACT_MP_CROUCH_IDLE ) then return ACT_HL2MP_IDLE_KNIFE + 3 end
+		if ( ( ( !self:GetEnabled() and self:GetHoldType() == "normal" ) or ( self:GetEnabled() and tr.Hit ) ) and act == ACT_MP_CROUCHWALK ) then return ACT_HL2MP_IDLE_KNIFE + 4 end
 
 	end
 
-	if ( IsPlayerInWater( self:GetOwner() ) && self:GetEnabled() ) then
+	if ( IsPlayerInWater( self:GetOwner() ) and self:GetEnabled() ) then
 		return KnifeHoldType[ act ]
 	end
 
@@ -1026,19 +1026,19 @@ function SWEP:DrawWorldModelTranslucent()
 	local bladesFound = false -- true if the model is OLD and does not have blade attachments
 	local blades = 0
 	for id, t in ipairs( self:GetAttachments() or {} ) do
-		if ( !string.match( t.name, "blade(%d+)" ) && !string.match( t.name, "quillon(%d+)" ) ) then continue end
+		if ( !string.match( t.name, "blade(%d+)" ) and !string.match( t.name, "quillon(%d+)" ) ) then continue end
 
 		local bladeNum = string.match( t.name, "blade(%d+)" )
 		local quillonNum = string.match( t.name, "quillon(%d+)" )
 
-		if ( bladeNum && self:LookupAttachment( "blade" .. bladeNum ) > 0 ) then
+		if ( bladeNum and self:LookupAttachment( "blade" .. bladeNum ) > 0 ) then
 			blades = blades + 1
 			local pos, dir = self:GetSaberPosAng( bladeNum )
 			rb655_RenderBlade( pos, dir, self:GetBladeLength(), self:GetMaxLength(), self:GetBladeWidth(), clr, self:GetDarkInner(), self:EntIndex(), IsPlayerUnderWater( self:GetOwner() ), false, blades )
 			bladesFound = true
 		end
 
-		if ( quillonNum && self:LookupAttachment( "quillon" .. quillonNum ) > 0 ) then
+		if ( quillonNum and self:LookupAttachment( "quillon" .. quillonNum ) > 0 ) then
 			blades = blades + 1
 			local pos, dir = self:GetSaberPosAng( quillonNum, true )
 			rb655_RenderBlade( pos, dir, self:GetBladeLength(), self:GetMaxLength(), self:GetBladeWidth(), clr, self:GetDarkInner(), self:EntIndex(), IsPlayerUnderWater( self:GetOwner() ), true, blades )
@@ -1056,7 +1056,7 @@ end
 
 --[[
 hook.Add( "ShouldDrawLocalPlayer", "rb655_lightsaber_weapon_draw", function()
-	if ( IsValid( LocalPlayer() ) && LocalPlayer().GetActiveWeapon && IsValid( LocalPlayer():GetActiveWeapon() ) && rb655_IsLightsaber( LocalPlayer():GetActiveWeapon() ) && !LocalPlayer():InVehicle() && LocalPlayer():Alive() && LocalPlayer():GetViewEntity() == LocalPlayer() ) then return true end
+	if ( IsValid( LocalPlayer() ) and LocalPlayer().GetActiveWeapon and IsValid( LocalPlayer():GetActiveWeapon() ) and rb655_IsLightsaber( LocalPlayer():GetActiveWeapon() ) and !LocalPlayer():InVehicle() and LocalPlayer():Alive() and LocalPlayer():GetViewEntity() == LocalPlayer() ) then return true end
 end )
 
 function SWEP:CalcView( ply, pos, ang, fov )
@@ -1119,7 +1119,7 @@ hook.Add( "PlayerBindPress", "rb655_sabers_force", function( ply, bind, pressed 
 	local ret = hook.Run( "LightsaberPlayerBindPress", ply, bind, pressed )
 	if ( ret != nil ) then ForceSelectEnabled = false return end
 
-	if ( bind == "impulse 100" && pressed ) then
+	if ( bind == "impulse 100" and pressed ) then
 		ForceSelectEnabled = !ForceSelectEnabled
 		return true
 	end
@@ -1131,11 +1131,11 @@ hook.Add( "PlayerBindPress", "rb655_sabers_force", function( ply, bind, pressed 
 		return true
 	end
 
-	if ( bind == "invprev" && pressed ) then
+	if ( bind == "invprev" and pressed ) then
 		RunConsoleCommand( "rb655_select_next", "-1" )
 		return true
 	end
-	if ( bind == "invnext" && pressed ) then
+	if ( bind == "invnext" and pressed ) then
 		RunConsoleCommand( "rb655_select_next", "1" )
 		return true
 	end
@@ -1224,7 +1224,7 @@ local function patchCalcViewHook( str )
 
 	hook.Add( "CalcView", str, function( ply, ... )
 		local ls = rb655_GetLightsaber( ply )
-		if ( IsValid( ply ) && IsValid( ls ) && ply:GetActiveWeapon() == ls ) then
+		if ( IsValid( ply ) and IsValid( ls ) and ply:GetActiveWeapon() == ls ) then
 			return
 		end
 		return originalFunc( ply, ... )
@@ -1253,7 +1253,7 @@ function SWEP:DrawHUD_FuckedUpHooks( y )
 
 		for str, func in pairs( hook.GetTable()[ "PlayerBindPress" ] ) do
 			local clr = Color( 255, 255, 128 )
-			if ( ( isstring( str ) && func( LocalPlayer(), "this_bind_doesnt_exist", true ) == true ) or ( !isstring( str ) && func( str, LocalPlayer(), "this_bind_doesnt_exist", true ) == true ) ) then
+			if ( ( isstring( str ) and func( LocalPlayer(), "this_bind_doesnt_exist", true ) == true ) or ( !isstring( str ) and func( str, LocalPlayer(), "this_bind_doesnt_exist", true ) == true ) ) then
 				clr = Color( 255, 128, 128 )
 			end
 			if ( !isstring( str ) ) then str = tostring( str ) end
@@ -1279,7 +1279,7 @@ function SWEP:DrawHUD_FuckedUpHooks( y )
 
 		for str, func in pairs( hook.GetTable()[ "CalcView" ] ) do
 			local clr = Color( 255, 255, 128 )
-			if ( ( isstring( str ) && func( LocalPlayer(), EyePos(), EyeAngles(), 90, 4, 16000 ) != nil ) or ( !isstring( str ) && func( str, LocalPlayer(), EyePos(), EyeAngles(), 90, 4, 16000 ) != nil ) ) then
+			if ( ( isstring( str ) and func( LocalPlayer(), EyePos(), EyeAngles(), 90, 4, 16000 ) != nil ) or ( !isstring( str ) and func( str, LocalPlayer(), EyePos(), EyeAngles(), 90, 4, 16000 ) != nil ) ) then
 				clr = Color( 255, 128, 128 )
 
 				-- Automatically patch the offender, this is BAD but what can I do about BAD addons?
@@ -1346,7 +1346,7 @@ local function DrawForceSelectionHUD( ForceSelectionEnabled, Force, MaxForce, Se
 	DrawHUDBox( x, y, w, h )
 
 	local barW = math.ceil( w * ( ForceBar / MaxForce ) )
-	if ( Force <= 1 && barW <= 1 ) then barW = 0 end
+	if ( Force <= 1 and barW <= 1 ) then barW = 0 end
 	draw.RoundedBox( 0, x, y, barW, h, Color_BLU )
 
 	draw.SimpleText( math.floor( Force / MaxForce * 100 ) .. "%", "SelectedForceHUD", x + w / 2, y + h / 2, Color_White, 1, 1 )
@@ -1400,7 +1400,7 @@ local function DrawForceSelectionHUD( ForceSelectionEnabled, Force, MaxForce, Se
 
 	local selectedForcePower = ForcePowers[ SelectedPower ]
 
-	if ( selectedForcePower && ForceSelectionEnabled ) then
+	if ( selectedForcePower and ForceSelectionEnabled ) then
 
 		-- Description
 

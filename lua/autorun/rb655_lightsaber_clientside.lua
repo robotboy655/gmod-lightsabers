@@ -316,12 +316,12 @@ function rb655_ProcessLightsaberEntity( ent )
 	local bladesFound = false -- true if the model is OLD and does not have blade attachments
 	local blades = 0
 	for id, t in ipairs( ent:GetAttachments() or {} ) do -- TODO: Remove the {} part
-		if ( !string.match( t.name, "blade(%d+)" ) && !string.match( t.name, "quillon(%d+)" ) ) then continue end
+		if ( !string.match( t.name, "blade(%d+)" ) and !string.match( t.name, "quillon(%d+)" ) ) then continue end
 
 		local bladeNum = string.match( t.name, "blade(%d+)" )
 		local quillonNum = string.match( t.name, "quillon(%d+)" )
 
-		if ( bladeNum && ent:LookupAttachment( "blade" .. bladeNum ) > 0 ) then
+		if ( bladeNum and ent:LookupAttachment( "blade" .. bladeNum ) > 0 ) then
 			blades = blades + 1
 			local pos, ang = ent:GetSaberPosAng( bladeNum )
 			rb655_ProcessBlade( ent:EntIndex(), pos, ang, ent:GetBladeLength(), blades )
@@ -329,7 +329,7 @@ function rb655_ProcessLightsaberEntity( ent )
 			bladesFound = true
 		end
 
-		if ( quillonNum && ent:LookupAttachment( "quillon" .. quillonNum ) > 0 ) then
+		if ( quillonNum and ent:LookupAttachment( "quillon" .. quillonNum ) > 0 ) then
 			blades = blades + 1
 			local pos, ang = ent:GetSaberPosAng( quillonNum, true )
 			rb655_ProcessBlade( ent:EntIndex(), pos, ang, rb655_CalculateQuillonLength( ent:GetBladeLength(), ent:GetMaxLength() ), blades, true )
