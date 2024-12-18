@@ -34,7 +34,7 @@ if ( SERVER ) then
 	end, "rb655_lightsaber_hiltonbelt" )
 
 	hook.Add( "PlayerInitialSpawn", "rb655_lightsaber_hiltonbelt", function()
-		SetGlobalBool( "rb655_lightsaber_hiltonbelt", hob_cvar:GetFloat() )
+		SetGlobalBool( "rb655_lightsaber_hiltonbelt", hob_cvar:GetFloat() > 0 )
 	end )
 
 	return

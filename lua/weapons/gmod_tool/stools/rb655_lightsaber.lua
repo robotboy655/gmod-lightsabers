@@ -154,7 +154,7 @@ function TOOL:LeftClick( trace )
 		end
 	end
 
-	local ent_lightsaber
+	local ent_lightsaber = NULL
 	if ( trace.Entity:IsNPC() ) then
 		if ( !IsValid( trace.Entity:GetActiveWeapon() ) or trace.Entity:GetActiveWeapon():GetClass() != "weapon_lightsaber" ) then
 			ent_lightsaber = trace.Entity:Give( "weapon_lightsaber" )

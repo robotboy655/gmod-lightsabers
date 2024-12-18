@@ -290,8 +290,8 @@ function SWEP:LoadToolValues( ply )
 		end
 
 		for k, v in pairs( list.Get( "rb655_LightsaberIgniteSounds" ) ) do
-			if ( v.rb655_lightsaber_onsound == onSnd ) then self:SetOnSound(onSnd) end
-			if ( v.rb655_lightsaber_offsound == offSnd ) then self:SetOnSound(offSnd) end
+			if ( v.rb655_lightsaber_onsound == onSnd ) then self:SetOnSound( onSnd ) end
+			if ( v.rb655_lightsaber_offsound == offSnd ) then self:SetOffSound( offSnd ) end
 		end
 
 		for k, v in pairs( list.Get( "rb655_LightsaberSwingSounds" ) ) do
@@ -337,8 +337,8 @@ hook.Add( "PlayerSpawnedSWEP", "rb655_lightsaber_swep_sync", function( ply, wep 
 end )
 
 function SWEP:Initialize()
-	self.LoopSound = self.LoopSound or "lightsaber/saber_loop" .. math.random( 1, 8 ) .. ".wav"
-	self.SwingSound = self.SwingSound or "lightsaber/saber_swing" .. math.random( 1, 2 ) .. ".wav"
+	self.LoopSound = self.LoopSound or ( "lightsaber/saber_loop" .. math.random( 1, 8 ) .. ".wav" )
+	self.SwingSound = self.SwingSound or ( "lightsaber/saber_swing" .. math.random( 1, 2 ) .. ".wav" )
 
 	self:SetWeaponHoldType( self:GetTargetHoldType() )
 

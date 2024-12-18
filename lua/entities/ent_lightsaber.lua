@@ -78,10 +78,10 @@ function ENT:Initialize()
 		self:SetMoveType( MOVETYPE_VPHYSICS )
 		self:SetSolid( SOLID_VPHYSICS )
 
-		self.LoopSound = self.LoopSound or "lightsaber/saber_loop" .. math.random( 1, 8 ) .. ".wav"
-		self.SwingSound = self.SwingSound or "lightsaber/saber_swing" .. math.random( 1, 2 ) .. ".wav"
-		self.OnSound = self.OnSound or "lightsaber/saber_on" .. math.random( 1, 2 ) .. ".wav"
-		self.OffSound = self.OffSound or "lightsaber/saber_off" .. math.random( 1, 2 ) .. ".wav"
+		self.LoopSound = self.LoopSound or ( "lightsaber/saber_loop" .. math.random( 1, 8 ) .. ".wav" )
+		self.SwingSound = self.SwingSound or ( "lightsaber/saber_swing" .. math.random( 1, 2 ) .. ".wav" )
+		self.OnSound = self.OnSound or ( "lightsaber/saber_on" .. math.random( 1, 2 ) .. ".wav" )
+		self.OffSound = self.OffSound or ( "lightsaber/saber_off" .. math.random( 1, 2 ) .. ".wav" )
 
 		--self:OnEnabled()
 	else
@@ -351,7 +351,7 @@ function ENT:Use( activator, caller, useType, value )
 	self:SetEnabled( !self:GetEnabled() )
 end
 
-function ENT:SpawnFunction( ply, tr )
+function ENT:SpawnFunction( ply, tr, ClassName )
 	if ( !tr.Hit or !ply:CheckLimit( "ent_lightsabers" ) ) then return end
 
 	local ent = ents.Create( ClassName )
